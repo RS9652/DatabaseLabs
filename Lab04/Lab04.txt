@@ -1,0 +1,142 @@
+C:\Program Files\PostgreSQL\17\bin>psql -U postgres
+Password for user postgres:
+psql (17.6)
+WARNING: Console code page (866) differs from Windows code page (1251)
+         8-bit characters might not work correctly. See psql reference
+         page "Notes for Windows users" for details.
+Type "help" for help.
+
+postgres=# CREATE DATABASE Lab04;
+CREATE DATABASE
+postgres=# \l
+                                                                 List of databases
+   Name    |  Owner   | Encoding | Locale Provider |         Collate         |          Ctype          | Locale | ICU Rules |   Access privileges
+-----------+----------+----------+-----------------+-------------------------+-------------------------+--------+-----------+-----------------------
+ lab04     | postgres | UTF8     | libc            | Russian_Kazakhstan.1251 | Russian_Kazakhstan.1251 |        |           |
+ mydb      | postgres | UTF8     | libc            | Russian_Kazakhstan.1251 | Russian_Kazakhstan.1251 |        |           |
+ postgres  | postgres | UTF8     | libc            | Russian_Kazakhstan.1251 | Russian_Kazakhstan.1251 |        |           |
+ template0 | postgres | UTF8     | libc            | Russian_Kazakhstan.1251 | Russian_Kazakhstan.1251 |        |           | =c/postgres          +
+           |          |          |                 |                         |                         |        |           | postgres=CTc/postgres
+ template1 | postgres | UTF8     | libc            | Russian_Kazakhstan.1251 | Russian_Kazakhstan.1251 |        |           | =c/postgres          +
+           |          |          |                 |                         |                         |        |           | postgres=CTc/postgres
+(5 rows)
+lab04=# DROP DATABASE IF EXISTS test_table;
+ЗАМЕЧАНИЕ:  база данных "test_table" не существует, пропускается
+DROP DATABASE
+
+postgres=# \c lab04
+You are now connected to database "lab04" as user "postgres".
+lab04=# CREATE TABLE students (
+lab04(#     student_id SERIAL PRIMARY KEY,
+lab04(#     first_name VARCHAR(50) NOT NULL,
+lab04(#     last_name VARCHAR(50) NOT NULL,
+lab04(#     email VARCHAR(100) UNIQUE NOT NULL,
+lab04(#     faculty VARCHAR(100)
+lab04(# );
+CREATE TABLE
+lab04=#
+lab04=# \dt
+          List of relations
+ Schema |   Name   | Type  |  Owner
+--------+----------+-------+----------
+ public | students | table | postgres
+(1 row)
+
+lab04=# ALTER TABLE students
+lab04-# ADD COLUMN date_of_birth DATE;
+ALTER TABLE
+lab04=# SELECT * FROM students;
+ student_id | first_name | last_name | email | faculty | date_of_birth
+------------+------------+-----------+-------+---------+---------------
+(0 rows)
+
+
+lab04=# ALTER TABLE students
+lab04-# DROP COLUMN faculty;
+ALTER TABLE
+lab04=# SELECT * FROM students;
+ student_id | first_name | last_name | email | date_of_birth
+------------+------------+-----------+-------+---------------
+(0 rows)
+
+
+lab04=# ALTER TABLE students
+lab04-# ALTER COLUMN first_name TYPE TEXT;
+ALTER TABLE
+lab04=# \dt
+          List of relations
+ Schema |   Name   | Type  |  Owner
+--------+----------+-------+----------
+ public | students | table | postgres
+(1 row)
+
+
+lab04=# ALTER TABLE students
+lab04-# ADD CONSTRAINT unique_student_email UNIQUE (email);
+ALTER TABLE
+lab04=#
+lab04=# ALTER TABLE students
+lab04-# RENAME COLUMN email TO email_adress;
+ALTER TABLE
+lab04=# ALTER TABLE students
+lab04-# RENAME TO university_students;
+ALTER TABLE
+lab04=# \dt
+                List of relations
+ Schema |        Name         | Type  |  Owner
+--------+---------------------+-------+----------
+ public | university_students | table | postgres
+(1 row)
+
+
+lab04=# CREATE TEMP TABLE temp_table_name (
+lab04(#     column1 datatype,
+lab04(#     ...
+lab04(# )\l
+                                                                 List of databases
+   Name    |  Owner   | Encoding | Locale Provider |         Collate         |          Ctype          | Locale | ICU Rules |   Access privileges
+-----------+----------+----------+-----------------+-------------------------+-------------------------+--------+-----------+-----------------------
+ lab04     | postgres | UTF8     | libc            | Russian_Kazakhstan.1251 | Russian_Kazakhstan.1251 |        |           |
+ postgres  | postgres | UTF8     | libc            | Russian_Kazakhstan.1251 | Russian_Kazakhstan.1251 |        |           |
+ template0 | postgres | UTF8     | libc            | Russian_Kazakhstan.1251 | Russian_Kazakhstan.1251 |        |           | =c/postgres          +
+           |          |          |                 |                         |                         |        |           | postgres=CTc/postgres
+ template1 | postgres | UTF8     | libc            | Russian_Kazakhstan.1251 | Russian_Kazakhstan.1251 |        |           | =c/postgres          +
+           |          |          |                 |                         |                         |        |           | postgres=CTc/postgres
+(4 rows)
+
+
+lab04-# \c lab04
+You are now connected to database "lab04" as user "postgres".
+lab04-# \dt
+                List of relations
+ Schema |        Name         | Type  |  Owner
+--------+---------------------+-------+----------
+ public | university_students | table | postgres
+(1 row)
+
+
+lab04-# CREATE TEMP TABLE temporare(ID SERIAL PRIMARY KEY, column_1 VARCHAR(100));
+ОШИБКА:  ошибка синтаксиса (примерное положение: "..")
+LINE 3:     ...
+            ^
+lab04=# CREATE TEMP TABLE temporare(ID SERIAL PRIMARY KEY, column_1 VARCHAR(100));
+CREATE TABLE
+lab04=# \dt
+                  List of relations
+   Schema   |        Name         | Type  |  Owner
+------------+---------------------+-------+----------
+ pg_temp_30 | temporare           | table | postgres
+ public     | university_students | table | postgres
+(2 rows)
+
+
+lab04=# SELECT * FROM temporare;
+ id | column_1
+----+----------
+(0 rows)
+
+
+lab04=# \q
+
+C:\Program Files\PostgreSQL\17\bin>
+
