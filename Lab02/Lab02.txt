@@ -1,0 +1,170 @@
+
+C:\Program Files\PostgreSQL\17\bin>psql -U postgres -d mydb
+Password for user postgres:
+psql (17.6)
+WARNING: Console code page (866) differs from Windows code page (1251)
+         8-bit characters might not work correctly. See psql reference
+         page "Notes for Windows users" for details.
+Type "help" for help.
+
+
+
+mydb=# CREATE TABLE students ( id SERIAL PRIMARY KEY, name VARCHAR(100), age INT);
+CREATE TABLE
+mydb=# SELECT * FROM students;
+ id | name | age
+----+------+-----
+(0 rows)
+
+mydb=# ALTER TABLE students
+mydb-# ADD COLUMN faculty VARCHAR(100);
+ALTER TABLE
+mydb=# SELECT * FROM students;
+ id | name | age | faculty
+----+------+-----+---------
+(0 rows)
+
+
+mydb=#  INSERT INTO students (name, age, faculty) VALUES ('Alice', 21, 'COM-25'), ('Bob', 23,'COM-25'),('Dobby', 83,'COM-35'),('George', 53,'COM-25');
+INSERT 0 4
+mydb=# SELECT * FROM students;
+ id |  name  | age | faculty
+----+--------+-----+---------
+  1 | Alice  |  21 | COM-25
+  2 | Bob    |  23 | COM-25
+  3 | Dobby  |  83 | COM-35
+  4 | George |  53 | COM-25
+(4 rows)
+
+mydb=# ALTER TABLE students
+mydb-# ADD COLUMN email VARCHAR(100);
+ALTER TABLE
+mydb=#
+mydb=# UPDATE students SET email = 'alex.jordan92@example.com' WHERE id = 1;
+UPDATE 1
+mydb=# UPDATE students SET email = 'maria_smith07@testmail.net' WHERE id = 2;
+UPDATE 1
+mydb=# UPDATE students SET email = 'kevin.lee2024@demo.org' WHERE id = 3;
+UPDATE 1
+mydb=# UPDATE students SET email = 'natalie.brown88@fakemail.com' WHERE id = 4;
+UPDATE 1
+mydb=# SELECT * FROM students;
+ id |  name  | age | faculty |            email
+----+--------+-----+---------+------------------------------
+  1 | Alice  |  21 | COM-25  | alex.jordan92@example.com
+  2 | Bob    |  23 | COM-25  | maria_smith07@testmail.net
+  3 | Dobby  |  83 | COM-35  | kevin.lee2024@demo.org
+  4 | George |  53 | COM-25  | natalie.brown88@fakemail.com
+(4 rows)
+
+
+mydb=# SELECT name, email FROM students WHERE faculty = 'COM-25';
+  name  |            email
+--------+------------------------------
+ Alice  | alex.jordan92@example.com
+ Bob    | maria_smith07@testmail.net
+ George | natalie.brown88@fakemail.com
+(3 rows)
+
+
+mydb=# SELECT name, email FROM students;
+  name  |            email
+--------+------------------------------
+ Alice  | alex.jordan92@example.com
+ Bob    | maria_smith07@testmail.net
+ Dobby  | kevin.lee2024@demo.org
+ George | natalie.brown88@fakemail.com
+(4 rows)
+
+mydb=# SELECT id, faculty FROM students;
+ id | faculty
+----+---------
+  1 | COM-25
+  2 | COM-25
+  3 | COM-35
+  4 | COM-25
+(4 rows)
+
+
+mydb=# SELECT name, email FROM students WHERE name = 'Dobby';
+ name  |         email
+-------+------------------------
+ Dobby | kevin.lee2024@demo.org
+(1 row)
+
+mydb=# SELECT * FROM students;
+ id |  name  | age | faculty |            email
+----+--------+-----+---------+------------------------------
+  1 | Alice  |  21 | COM-25  | alex.jordan92@example.com
+  2 | Bob    |  23 | COM-25  | maria_smith07@testmail.net
+  3 | Dobby  |  83 | COM-35  | kevin.lee2024@demo.org
+  4 | George |  53 | COM-25  | natalie.brown88@fakemail.com
+(4 rows)
+
+
+mydb=# SELECT name, email FROM students ORDER BY name;
+  name  |            email
+--------+------------------------------
+ Alice  | alex.jordan92@example.com
+ Bob    | maria_smith07@testmail.net
+ Dobby  | kevin.lee2024@demo.org
+ George | natalie.brown88@fakemail.com
+(4 rows)
+
+
+mydb=# SELECT name, email FROM students ORDER BY name DESC;
+  name  |            email
+--------+------------------------------
+ George | natalie.brown88@fakemail.com
+ Dobby  | kevin.lee2024@demo.org
+ Bob    | maria_smith07@testmail.net
+ Alice  | alex.jordan92@example.com
+(4 rows)
+
+
+mydb=# SELECT name, email FROM students LIMIT 2;
+ name  |           email
+-------+----------------------------
+ Alice | alex.jordan92@example.com
+ Bob   | maria_smith07@testmail.net
+(2 rows)
+
+
+mydb=# -- This query retrieves all students from the Engineering faculty.
+mydb=# SELECT name, faculty FROM students WHERE faculty = 'Engineering';
+ name | faculty
+------+---------
+(0 rows)
+
+
+mydb=#
+mydb=# /* This is a multi-line comment.*/
+mydb-# \dt
+          List of relations
+ Schema |   Name   | Type  |  Owner
+--------+----------+-------+----------
+ public | students | table | postgres
+(1 row)
+
+
+mydb-# SELECT * FROM students;
+ id |  name  | age | faculty |            email
+----+--------+-----+---------+------------------------------
+  1 | Alice  |  21 | COM-25  | alex.jordan92@example.com
+  2 | Bob    |  23 | COM-25  | maria_smith07@testmail.net
+  3 | Dobby  |  83 | COM-35  | kevin.lee2024@demo.org
+  4 | George |  53 | COM-25  | natalie.brown88@fakemail.com
+(4 rows)
+
+
+mydb=# SELECT name, faculty FROM students WHERE faculty = 'COM-35';
+ name  | faculty
+-------+---------
+ Dobby | COM-35
+(1 row)
+
+mydb=# DROP TABLE students;
+DROP TABLE
+mydb=# \q
+
+C:\Program Files\PostgreSQL\17\bin>
