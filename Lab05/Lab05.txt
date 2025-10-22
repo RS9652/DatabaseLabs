@@ -1,0 +1,274 @@
+C:\Program Files\PostgreSQL\17\bin>psql -U postgres
+Password for user postgres:
+psql (17.6)
+WARNING: Console code page (866) differs from Windows code page (1251)
+         8-bit characters might not work correctly. See psql reference
+         page "Notes for Windows users" for details.
+Type "help" for help.
+postgres=# CREATE DATABASE lab05;
+CREATE DATABASE
+postgres=# \c lab05
+You are now connected to database "lab05" as user "postgres".
+lab05=# CREATE TABLE students (
+lab05(# student_id INTEGER PRIMARY KEY,
+lab05(# name VARCHAR(100),
+lab05(# email VARCHAR(150));
+CREATE TABLE
+lab05=# \dt
+          List of relations
+ Schema |   Name   | Type  |  Owner
+--------+----------+-------+----------
+ public | students | table | postgres
+(1 row)
+
+
+lab05=# SELECT * FROM students;
+ student_id | name | email
+------------+------+-------
+(0 rows)
+lab05=# INSERT INTO students (student_id) VALUES (1);
+INSERT 0 1
+lab05=# INSERT INTO students (student_id) VALUES (1);
+ОШИБКА:  повторяющееся значение ключа нарушает ограничение уникальности "students_pkey"
+DETAIL:  Ключ "(student_id)=(1)" уже существует.
+lab05=# DROP TABLE students;
+DROP TABLE
+lab05=# \dt
+Did not find any relations.
+lab05=# CREATE TABLE students (student_id INTEGER, name VARCHAR(100), email VARCHAR(150), PRIMARY KEY (student_id));
+CREATE TABLE
+lab05=# INSERT INTO students (student_id) VALUES (1);
+INSERT 0 1
+lab05=# INSERT INTO students (student_id) VALUES (1);
+ОШИБКА:  повторяющееся значение ключа нарушает ограничение уникальности "students_pkey"
+DETAIL:  Ключ "(student_id)=(1)" уже существует.
+lab05=# -- Define primary key at table level
+lab05=# CREATE TABLE students (
+lab05(#     student_id INTEGER,
+lab05(#     name VARCHAR(100),
+lab05(#     email VARCHAR(150),
+lab05(#     PRIMARY KEY (student_id)
+lab05(# );
+CREATE TABLE
+lab05=# DROP TABLE students;
+DROP TABLE
+lab05=# -- Define primary key with a custom name
+lab05=# CREATE TABLE students (
+lab05(#     student_id INTEGER,
+lab05(#     name VARCHAR(100),
+lab05(#     email VARCHAR(150),
+lab05(#     CONSTRAINT pk_students PRIMARY KEY (student_id)
+lab05(# );
+CREATE TABLE
+lab05=# -- Add primary key to existing table
+lab05=# ALTER TABLE students ADD CONSTRAINT pk_name PRIMARY KEY (name);
+ОШИБКА:  таблица "students" не может иметь несколько первичных ключей
+lab05=# DROP TABLE students;
+DROP TABLE
+lab05=# -- Define primary key with a custom name
+lab05=# CREATE TABLE students (
+lab05(#     student_id INTEGER,
+lab05(#     name VARCHAR(100),
+lab05(#     email VARCHAR(150),
+lab05(#     CONSTRAINT pk_students PRIMARY KEY (student_id)
+lab05(# );
+CREATE TABLE
+lab05=#
+lab05=# DROP TABLE students;
+DROP TABLE
+lab05=# -- Define primary key with a custom name
+lab05=# CREATE TABLE students (
+lab05(#     student_id INTEGER,
+lab05(#     name VARCHAR(100),
+lab05(#     email VARCHAR(150),
+lab05(#     CONSTRAINT pk_students PRIMARY KEY (student_id)
+lab05(#
+lab05(# );
+CREATE TABLE
+lab05=# DROP TABLE students;
+DROP TABLE
+lab05=# -- Define primary key with a custom name
+lab05=# CREATE TABLE students (
+lab05(#     student_id INTEGER,
+lab05(#     name VARCHAR(100),
+lab05(#     email VARCHAR(150));
+CREATE TABLE
+lab05=# -- Add primary key to existing table
+lab05=# ALTER TABLE students ADD CONSTRAINT pk_students PRIMARY KEY (student_id);
+ALTER TABLE
+lab05=#
+lab05=# DROP TABLE students;
+DROP TABLE
+lab05=# CREATE TABLE students (
+lab05(#     student_id SERIAL PRIMARY KEY,
+lab05(#     name VARCHAR(100) NOT NULL,
+lab05(#     email VARCHAR(150) UNIQUE,
+lab05(#     faculty VARCHAR(50)
+lab05(# );
+CREATE TABLE
+lab05=# -- Insert sample data
+lab05=# INSERT INTO students (name, email, faculty) VALUES
+lab05-# ('Alice Johnson', 'alice@alatoo.edu.kg', 'Computer Science'),
+lab05-# ('Bob Smith', 'bob@alatoo.edu.kg', 'Mathematics'),
+lab05-# ('Carol Davis', 'carol@alatoo.edu.kg', 'Computer Science');
+INSERT 0 3
+lab05=# SELECT * FROM students;
+ student_id |     name      |        email        |     faculty
+------------+---------------+---------------------+------------------
+          1 | Alice Johnson | alice@alatoo.edu.kg | Computer Science
+          2 | Bob Smith     | bob@alatoo.edu.kg   | Mathematics
+          3 | Carol Davis   | carol@alatoo.edu.kg | Computer Science
+(3 rows)
+
+
+lab05=# CREATE TABLE course_enrollments (
+lab05(#     student_id INTEGER,
+lab05(#     course_id INTEGER,
+lab05(#     semester VARCHAR(20),
+lab05(#     enrollment_date DATE DEFAULT CURRENT_DATE,
+lab05(#     grade CHAR(2),
+lab05(#     PRIMARY KEY (student_id, course_id, semester)
+lab05(# );
+CREATE TABLE
+lab05=#
+lab05=# -- Insert sample data
+lab05=# INSERT INTO course_enrollments (student_id, course_id, semester, grade) VALUES
+lab05-# (1, 101, '2024-Spring', 'A'),
+lab05-# (1, 102, '2024-Spring', 'B+'),
+lab05-# (2, 101, '2024-Spring', 'A-'),
+lab05-# (1, 101, '2024-Fall', 'A+');  -- Same student can take same course in different semester
+INSERT 0 4
+lab05=# INSERT INTO course_enrollments (student_id, course_id, semester, grade) VALUES(
+lab05(# (2, 101, '2024-Spring', 'A-'));
+ОШИБКА:  INSERT содержит больше целевых столбцов, чем выражений
+LINE 1: INSERT INTO course_enrollments (student_id, course_id, semes...
+                                                    ^
+HINT:  Источником данных является строка, включающая столько же столбцов, сколько требуется для INSERT. Вы намеренно использовали скобки?
+lab05=# INSERT INTO course_enrollments (student_id, course_id, semester, grade) VALUES
+lab05-# (2, 101, '2024-Spring', 'A-');
+ОШИБКА:  повторяющееся значение ключа нарушает ограничение уникальности "course_enrollments_pkey"
+DETAIL:  Ключ "(student_id, course_id, semester)=(2, 101, 2024-Spring)" уже существует.
+lab05=# CREATE TABLE products (
+lab05(#     product_id SERIAL PRIMARY KEY,
+lab05(#     product_name VARCHAR(100) NOT NULL,
+lab05(#     price DECIMAL(10,2)
+lab05(# );
+CREATE TABLE
+lab05=# CREATE TABLE transactions (
+lab05(#     transaction_id BIGSERIAL PRIMARY KEY,  -- Can handle very large numbers
+lab05(#     amount DECIMAL(15,2),
+lab05(#     transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+lab05(# );
+CREATE TABLE
+lab05=# SELECT * FROM products;
+ product_id | product_name | price
+------------+--------------+-------
+(0 rows)
+
+
+lab05=# SELECT * FROM transactions;
+ transaction_id | amount | transaction_date
+----------------+--------+------------------
+(0 rows)
+
+
+lab05=# INSERT INTO transactions (amount) VALUES (100), (200),(300);
+INSERT 0 3
+lab05=# SELECT * FROM transactions;
+ transaction_id | amount |      transaction_date
+----------------+--------+----------------------------
+              1 | 100.00 | 2025-10-22 17:40:50.376163
+              2 | 200.00 | 2025-10-22 17:40:50.376163
+              3 | 300.00 | 2025-10-22 17:40:50.376163
+(3 rows)
+
+
+lab05=# -- IDENTITY ALWAYS - PostgreSQL controls the value completely
+lab05=# CREATE TABLE orders (
+lab05(#     order_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+lab05(#     customer_name VARCHAR(100),
+lab05(#     order_date DATE DEFAULT CURRENT_DATE
+lab05(# );
+CREATE TABLE
+lab05=# -- IDENTITY BY DEFAULT - Allows manual insertion but auto-generates if not provided
+lab05=# CREATE TABLE customers (
+lab05(#     customer_id INTEGER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+lab05(#     customer_name VARCHAR(100),
+lab05(#     email VARCHAR(150)
+lab05(# );
+CREATE TABLE
+lab05=# INSERT INTO orders (customer_name) VALUES ('Bob');
+INSERT 0 1
+lab05=# SELECT * FROM orders;
+ order_id | customer_name | order_date
+----------+---------------+------------
+        1 | Bob           | 2025-10-22
+(1 row)
+
+
+lab05=# INSERT INTO orders (order_id,customer_name) VALUES (1,'Bob');
+ОШИБКА:  в столбец "order_id" можно вставить только значение по умолчанию
+DETAIL:  Столбец "order_id" является столбцом идентификации со свойством GENERATED ALWAYS.
+HINT:  Для переопределения укажите OVERRIDING SYSTEM VALUE.
+lab05=# INSERT INTO orders (order_id,customer_name) OVERRIDING SYSTEM VALUES (1,'Bob');
+ОШИБКА:  ошибка синтаксиса (примерное положение: "VALUES")
+LINE 1: ...orders (order_id,customer_name) OVERRIDING SYSTEM VALUES (1,...
+                                                             ^
+lab05=# -- You can still insert specific values with BY DEFAULT
+lab05=# INSERT INTO customers (customer_id, customer_name, email)
+lab05-# VALUES (1000, 'VIP Customer', 'vip@example.com');
+INSERT 0 1
+lab05=# -- Define primary key at column level
+lab05=# CREATE TABLE students (
+lab05(#     student_id INTEGER PRIMARY KEY,
+lab05(#     name VARCHAR(100),
+lab05(#     email VARCHAR(150)
+lab05(#     email VARCHAR(150));
+ОШИБКА:  ошибка синтаксиса (примерное положение: "email")
+LINE 5:     email VARCHAR(150));
+            ^
+lab05=# CREATE TABLE example (student_id SERIAL PRIMARY KEY,
+lab05(# name VARCHAR(100) PRIMARY KEY,
+lab05(# email VARCHAR  (100));
+ОШИБКА:  таблица "example" не может иметь несколько первичных ключей
+LINE 2: name VARCHAR(100) PRIMARY KEY,
+                          ^
+lab05=# CREATE TABLE example (student_id SERIAL, name VARCHAR(100), date DEFAULT CURRENT DATE, PRIMARY KEY (student_id,name));
+ОШИБКА:  ошибка синтаксиса (примерное положение: "DEFAULT")
+LINE 1: ...ample (student_id SERIAL, name VARCHAR(100), date DEFAULT CU...
+                                                             ^
+lab05=# CREATE TABLE example (student_id SERIAL, name VARCHAR(100), date DATE DEFAULT CURRENT DATE, PRIMARY KEY (student_id,name));
+ОШИБКА:  ошибка синтаксиса (примерное положение: "DATE")
+LINE 1: ...IAL, name VARCHAR(100), date DATE DEFAULT CURRENT DATE, PRIM...
+                                                             ^
+lab05=# CREATE TABLE example (student_id SERIAL, name VARCHAR(100), date DATE DEFAULT CURRENT_DATE, PRIMARY KEY (student_id,name));
+CREATE TABLE
+lab05=# CREATE TABLE departments (
+lab05(#     dept_id INTEGER PRIMARY KEY,
+lab05(#     dept_name VARCHAR(100)
+lab05(# );
+CREATE TABLE
+lab05=# -- This will fail due to duplicate primary key
+lab05=# INSERT INTO departments VALUES (1, 'Computer Science');
+INSERT 0 1
+lab05=# INSERT INTO departments VALUES (1, 'Mathematics'); -- ERROR: duplicate key value
+ОШИБКА:  повторяющееся значение ключа нарушает ограничение уникальности "departments_pkey"
+DETAIL:  Ключ "(dept_id)=(1)" уже существует.
+lab05=# -- This will fail because primary key cannot be NULL
+lab05=# INSERT INTO departments VALUES (NULL, 'Physics'); -- ERROR: null value in column "dept_id"
+ОШИБКА:  значение NULL в столбце "dept_id" отношения "departments" нарушает ограничение NOT NULL
+DETAIL:  Ошибочная строка содержит (null, Physics).
+lab05=# \d students
+                                          Table "public.students"
+   Column   |          Type          | Collation | Nullable |                   Default
+------------+------------------------+-----------+----------+----------------------------------------------
+ student_id | integer                |           | not null | nextval('students_student_id_seq'::regclass)
+ name       | character varying(100) |           | not null |
+ email      | character varying(150) |           |          |
+ faculty    | character varying(50)  |           |          |
+Indexes:
+    "students_pkey" PRIMARY KEY, btree (student_id)
+    "students_email_key" UNIQUE CONSTRAINT, btree (email)
+
+
+lab05=#
