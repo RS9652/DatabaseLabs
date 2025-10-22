@@ -1,0 +1,354 @@
+lab05-# \d
+                       List of relations
+ Schema |              Name               |   Type   |  Owner
+--------+---------------------------------+----------+----------
+ public | course_enrollments              | table    | postgres
+ public | customers                       | table    | postgres
+ public | customers_customer_id_seq       | sequence | postgres
+ public | departments                     | table    | postgres
+ public | example                         | table    | postgres
+ public | example_student_id_seq          | sequence | postgres
+ public | orders                          | table    | postgres
+ public | orders_order_id_seq             | sequence | postgres
+ public | products                        | table    | postgres
+ public | products_product_id_seq         | sequence | postgres
+ public | students                        | table    | postgres
+ public | students_student_id_seq         | sequence | postgres
+ public | transactions                    | table    | postgres
+ public | transactions_transaction_id_seq | sequence | postgres
+(14 rows)
+
+
+lab05-# CREATE TABLE departments (dept_id SERIAL PRIMARY KEY, dept_name VARCHAR(100) NOT NULL, location VARCHAR(100));
+ОШИБКА:  ошибка синтаксиса (примерное положение: "cls")
+LINE 1: cls
+        ^
+lab05=# CREATE TABLE departments (dept_id SERIAL PRIMARY KEY, dept_name VARCHAR(100) NOT NULL, location VARCHAR(100));
+ОШИБКА:  отношение "departments" уже существует
+lab05=# CREATE DATABASE Lab06;
+CREATE DATABASE
+lab05=# \c Lab06
+connection to server at "localhost" (::1), port 5432 failed: ВАЖНО:  база данных "Lab06" не существует
+Previous connection kept
+lab05=# \c Lab06
+connection to server at "localhost" (::1), port 5432 failed: ВАЖНО:  база данных "Lab06" не существует
+Previous connection kept
+lab05=# \l
+                                                                 List of databases
+   Name    |  Owner   | Encoding | Locale Provider |         Collate         |          Ctype          | Locale | ICU Rules |   Access privileges
+-----------+----------+----------+-----------------+-------------------------+-------------------------+--------+-----------+-----------------------
+ lab05     | postgres | UTF8     | libc            | Russian_Kazakhstan.1251 | Russian_Kazakhstan.1251 |        |           |
+ lab06     | postgres | UTF8     | libc            | Russian_Kazakhstan.1251 | Russian_Kazakhstan.1251 |        |           |
+ postgres  | postgres | UTF8     | libc            | Russian_Kazakhstan.1251 | Russian_Kazakhstan.1251 |        |           |
+ template0 | postgres | UTF8     | libc            | Russian_Kazakhstan.1251 | Russian_Kazakhstan.1251 |        |           | =c/postgres          +
+           |          |          |                 |                         |                         |        |           | postgres=CTc/postgres
+ template1 | postgres | UTF8     | libc            | Russian_Kazakhstan.1251 | Russian_Kazakhstan.1251 |        |           | =c/postgres          +
+           |          |          |                 |                         |                         |        |           | postgres=CTc/postgres
+(5 rows)
+
+
+lab05=# \c lab06
+You are now connected to database "lab06" as user "postgres".
+lab06=# CREATE TABLE departments (dept_id SERIAL PRIMARY KEY, dept_name VARCHAR(100) NOT NULL, location VARCHAR(100));
+CREATE TABLE
+lab06=# CREATE TABLE employees (emp_id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL, surname VARCHAR(100),dept_id INTEGER REFERENCES departments(dept_id));
+CREATE TABLE
+lab06=# DROP TABLE employees;
+DROP TABLE
+lab06=# CREATE TABLE employees (emp_id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL, surname VARCHAR(100),FOREIGN KEY (dept_id) REFERENCES departments(dept_id));
+ОШИБКА:  столбец "dept_id", указанный в ограничении внешнего ключа, не существует
+lab06=# CREATE TABLE employees (emp_id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL, surname VARCHAR(100),dept_id INTEGER, FOREIGN KEY (dept_id) REFERENCES departments(dept_id));
+CREATE TABLE
+lab06=# DROP TABLE empoyees;
+ОШИБКА:  таблица "empoyees" не существует
+lab06=# DROP TABLE employees;
+DROP TABLE
+lab06=# CREATE TABLE employees (emp_id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL, surname VARCHAR(100));
+CREATE TABLE
+lab06=# ALTER TABLE employees
+lab06-# ADD CONSTRAINT fk_employee_department
+lab06-# FOREIGN KEY (dept_id) REFERENCES departments (dept_id);
+ОШИБКА:  столбец "dept_id", указанный в ограничении внешнего ключа, не существует
+lab06=# ALTER TABLE employees
+lab06-# ADD COLUMN dept_id INTEGER;
+ALTER TABLE
+lab06=# SELECT * FROM employees;
+ emp_id | name | surname | dept_id
+--------+------+---------+---------
+(0 rows)
+
+
+lab06=# ALTER TABLE employees
+lab06-# ADD CONSTRAINT fk_employee_department
+lab06-# FOREIGN KEY (dept_id) REFERENCES departments (dept_id);
+ALTER TABLE
+lab06=# INSERT INTO employees (dept_name) VALUES ('LAS'), ('SFT'),('PSY');
+ОШИБКА:  столбец "dept_name" в таблице "employees" не существует
+LINE 1: INSERT INTO employees (dept_name) VALUES ('LAS'), ('SFT'),('...
+                               ^
+lab06=# INSERT INTO departments (dept_name) VALUES ('LAS'), ('SFT'),('PSY');
+INSERT 0 3
+lab06=# SELECT * FROM departments;
+ dept_id | dept_name | location
+---------+-----------+----------
+       1 | LAS       |
+       2 | SFT       |
+       3 | PSY       |
+(3 rows)
+
+
+lab06=# INSERT INTO employees (name,surname) VALUES ('Bob','Frank'),('Bob1','Frank1'),('Bob3','Frank3');
+INSERT 0 3
+lab06=# SELECT * FROM employees;
+ emp_id | name | surname | dept_id
+--------+------+---------+---------
+      1 | Bob  | Frank   |
+      2 | Bob1 | Frank1  |
+      3 | Bob3 | Frank3  |
+(3 rows)
+
+
+lab06=# INSERT INTO employees (dept_id) VALUES (1),(2),(3);
+ОШИБКА:  значение NULL в столбце "name" отношения "employees" нарушает ограничение NOT NULL
+DETAIL:  Ошибочная строка содержит (4, null, null, 1).
+lab06=# SELECT * FROM employees;
+ emp_id | name | surname | dept_id
+--------+------+---------+---------
+      1 | Bob  | Frank   |
+      2 | Bob1 | Frank1  |
+      3 | Bob3 | Frank3  |
+(3 rows)
+
+
+lab06=# INSERT INTO employees (dept_id) VALUES (1);
+ОШИБКА:  значение NULL в столбце "name" отношения "employees" нарушает ограничение NOT NULL
+DETAIL:  Ошибочная строка содержит (5, null, null, 1).
+lab06=# INSERT INTO employees (name, surname, dept_id)VALUES   ('John', 'Smith', 1),  ('Mary', 'Jones', 2),  ('Alice', 'White', 3);
+INSERT 0 3
+lab06=# SELECT * FROM employees;
+ emp_id | name  | surname | dept_id
+--------+-------+---------+---------
+      1 | Bob   | Frank   |
+      2 | Bob1  | Frank1  |
+      3 | Bob3  | Frank3  |
+      6 | John  | Smith   |       1
+      7 | Mary  | Jones   |       2
+      8 | Alice | White   |       3
+(6 rows)
+
+
+lab06=# CREATE TABLE employees1 (emp_id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL, surname VARCHAR(100),dept_id INTEGER,CONSTRAINT fk_employee_department FOREIGN KEY (dept_id) REFERENCES departments(dept_id));
+CREATE TABLE
+lab06=# INSERT INTO departments (dept_name,location) VALUES ('Engineering','Block A');
+INSERT 0 1
+lab06=# INSERT INTO employees (name,surname,dept_id) VALUES ('John', 'Doe',1);
+INSERT 0 1
+lab06=# INSERT INTO employees (name,surname,dept_id) VALUES ('John', 'Doe',5);
+ОШИБКА:  INSERT или UPDATE в таблице "employees" нарушает ограничение внешнего ключа "fk_employee_department"
+DETAIL:  Ключ (dept_id)=(5) отсутствует в таблице "departments".
+lab06=# DELETE FROM departments WHERE dept_id = 1;
+ОШИБКА:  UPDATE или DELETE в таблице "departments" нарушает ограничение внешнего ключа "fk_employee_department" таблицы "employees"
+DETAIL:  На ключ (dept_id)=(1) всё ещё есть ссылки в таблице "employees".
+lab06=# --One to one relationships
+lab06=# CREATE TABLE users (user_id SERIAL PRIMARY KEY,username VARCHAR(100) UNIQUE NOT NULL, email VARCHAR(100) UNIQUE NOT NULL ,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE
+lab06=# CREATE TABLE user_profiles (profile_id SERIAL PRIMARY KEY,user_id INTEGER UNIQUE NOT NULL, first_name VARCHAR(100),last_name VARCHAR(100),bio TEXT, profile_picture_url(255), FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE);
+ОШИБКА:  ошибка синтаксиса (примерное положение: "(")
+LINE 1: ...st_name VARCHAR(100),bio TEXT, profile_picture_url(255), FOR...
+                                                             ^
+lab06=# CREATE TABLE user_profiles (profile_id SERIAL PRIMARY KEY,user_id INTEGER UNIQUE NOT NULL, first_name VARCHAR(100),last_name VARCHAR(100),bio TEXT, profile_picture_url (255), FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE);
+ОШИБКА:  ошибка синтаксиса (примерное положение: "(")
+LINE 1: ...t_name VARCHAR(100),bio TEXT, profile_picture_url (255), FOR...
+                                                             ^
+lab06=# CREATE TABLE user_profiles (profile_id SERIAL PRIMARY KEY,user_id INTEGER UNIQUE NOT NULL, first_name VARCHAR(100),last_name VARCHAR(100),bio TEXT, profile_picture_url VARCHAR(255), FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE);
+CREATE TABLE
+lab06=# INSERT INTO users (username, email) VALUES ('Johndoe','john@gmail.com');
+INSERT 0 1
+lab06=# INSERT INTO user_profiles (user_id, first_name, last_name,bio) VALUES (1,'John','doe','Hi, there!');
+INSERT 0 1
+lab06=# INSERT INTO user_profiles (user_id, first_name, last_name,bio) VALUES (1,'Janen','doe','Hi, there!');
+ОШИБКА:  повторяющееся значение ключа нарушает ограничение уникальности "user_profiles_user_id_key"
+DETAIL:  Ключ "(user_id)=(1)" уже существует.
+lab06=# --One-to-many relations
+lab06=# \d departments
+                                        Table "public.departments"
+  Column   |          Type          | Collation | Nullable |                   Default
+-----------+------------------------+-----------+----------+----------------------------------------------
+ dept_id   | integer                |           | not null | nextval('departments_dept_id_seq'::regclass)
+ dept_name | character varying(100) |           | not null |
+ location  | character varying(100) |           |          |
+Indexes:
+    "departments_pkey" PRIMARY KEY, btree (dept_id)
+Referenced by:
+    TABLE "employees" CONSTRAINT "fk_employee_department" FOREIGN KEY (dept_id) REFERENCES departments(dept_id)
+    TABLE "employees1" CONSTRAINT "fk_employee_department" FOREIGN KEY (dept_id) REFERENCES departments(dept_id)
+
+
+lab06=# DROP TABLE departments;
+ОШИБКА:  удалить объект таблица departments нельзя, так как от него зависят другие объекты
+DETAIL:  ограничение fk_employee_department в отношении таблица employees зависит от объекта таблица departments
+ограничение fk_employee_department в отношении таблица employees1 зависит от объекта таблица departments
+HINT:  Для удаления зависимых объектов используйте DROP ... CASCADE.
+lab06=# DROP TABLE employees;
+DROP TABLE
+lab06=# DROP TABLE departments;
+ОШИБКА:  удалить объект таблица departments нельзя, так как от него зависят другие объекты
+DETAIL:  ограничение fk_employee_department в отношении таблица employees1 зависит от объекта таблица departments
+HINT:  Для удаления зависимых объектов используйте DROP ... CASCADE.
+lab06=# DROP TABLE departments CASCADE;
+ЗАМЕЧАНИЕ:  удаление распространяется на объект ограничение fk_employee_department в отношении таблица employees1
+DROP TABLE
+lab06=# DROP TABLE employees1;
+DROP TABLE
+lab06=# CREATE TABLE departments (dept_id SERIAL PRIMARY KEY, dept_name VARCHAR(100) NOT NULL,manager_name VARCHAR(100), budget DECIMAL(10,2));
+CREATE TABLE
+lab06=# CREATE TABLE employees (emp_id SERIAL PRIMARY KEY, first_name VARCHAR(100) NOT NULL,manager_name VARCHAR(100), budget DECIMAL(10,2));
+CREATE TABLE
+lab06=# DROP TABLE employees;
+DROP TABLE
+lab06=# CREATE TABLE employees (emp_id SERIAL PRIMARY KEY, first_name VARCHAR(100) NOT NULL,last_name VARCHAR(100) NOT NULL,position VARCHAR(100), salary DECIMAL(10,2), hire_date DATE DEFAULT CURRENT_DATE, dept_id INTEGER NOT NULL,FOREIGN KEY (dept_id) REFERENCES departments(dept_id) ON DELETE RESTRICT);
+CREATE TABLE
+lab06=# INSERT INTO departments (dept_name,manager_name, budget) VALUES ('Eng','Alice',400.00),('Mark','Bob', 23.00);
+INSERT 0 2
+lab06=# INSERT INTO employees (first_name, last_name, position, salary, dept_id) VALUES
+lab06-# ('John', 'Smith', 'Software Engineer', 75000.00, 1),
+lab06-# ('Jane', 'Doe', 'Senior Developer', 85000.00, 1),
+lab06-# ('Mike', 'Brown', 'DevOps Engineer', 80000.00, 1),
+lab06-# ('Sarah', 'Davis', 'Marketing Specialist', 55000.00, 2);
+INSERT 0 4
+lab06=# SELECT d.dept_name, e.first_name, e.last_name, e.position
+lab06-# FROM departments d
+lab06-# JOIN employees e ON d.dept_id = e.dept_id
+lab06-# ORDER BY d.dept_name, e.last_name;
+ dept_name | first_name | last_name |       position
+-----------+------------+-----------+----------------------
+ Eng       | Mike       | Brown     | DevOps Engineer
+ Eng       | Jane       | Doe       | Senior Developer
+ Eng       | John       | Smith     | Software Engineer
+ Mark      | Sarah      | Davis     | Marketing Specialist
+(4 rows)
+
+
+lab06=# \dt
+             List of relations
+ Schema |     Name      | Type  |  Owner
+--------+---------------+-------+----------
+ public | departments   | table | postgres
+ public | employees     | table | postgres
+ public | user_profiles | table | postgres
+ public | users         | table | postgres
+(4 rows)
+
+
+lab06=# DROP TABLE departments;
+ОШИБКА:  удалить объект таблица departments нельзя, так как от него зависят другие объекты
+DETAIL:  ограничение employees_dept_id_fkey в отношении таблица employees зависит от объекта таблица departments
+HINT:  Для удаления зависимых объектов используйте DROP ... CASCADE.
+lab06=# DROP TABLE departments CASCADE;
+ЗАМЕЧАНИЕ:  удаление распространяется на объект ограничение employees_dept_id_fkey в отношении таблица employees
+DROP TABLE
+lab06=# DROP TABLE employees CASCADE;
+DROP TABLE
+lab06=# DROP TABLE user_profiles;
+DROP TABLE
+lab06=# DROP TABLE users;
+DROP TABLE
+lab06=# CREATE TABLE students (
+lab06(#     student_id SERIAL PRIMARY KEY,
+lab06(#     first_name VARCHAR(50) NOT NULL,
+lab06(#     last_name VARCHAR(50) NOT NULL,
+lab06(#     email VARCHAR(100) UNIQUE,
+lab06(#     enrollment_date DATE DEFAULT CURRENT_DATE
+lab06(# );
+CREATE TABLE
+lab06=# CREATE TABLE courses (
+lab06(#     course_id SERIAL PRIMARY KEY,
+lab06(#     course_code VARCHAR(10) UNIQUE NOT NULL,
+lab06(#     course_name VARCHAR(100) NOT NULL,
+lab06(#     credits INTEGER NOT NULL,
+lab06(#     instructor VARCHAR(100)
+lab06(# );
+CREATE TABLE
+lab06=# CREATE TABLE student_enrollments (
+lab06(#     enrollment_id SERIAL PRIMARY KEY,
+lab06(#     student_id INTEGER NOT NULL,
+lab06(#     course_id INTEGER NOT NULL,
+lab06(#     enrollment_date DATE DEFAULT CURRENT_DATE,
+lab06(#     grade CHAR(2), -- Additional attributes specific to the relationship
+lab06(#
+lab06(#     -- Foreign key constraints
+lab06(#     FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
+lab06(#     FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE,
+lab06(#
+lab06(#     -- Prevent duplicate enrollments
+lab06(#     UNIQUE(student_id, course_id)
+lab06(# );
+CREATE TABLE
+lab06=# INSERT INTO students (first_name, last_name, email) VALUES
+lab06-# ('Alice', 'Johnson', 'alice@university.edu'),
+lab06-# ('Bob', 'Smith', 'bob@university.edu'),
+lab06-# ('Carol', 'Wilson', 'carol@university.edu');
+INSERT 0 3
+lab06=# INSERT INTO courses (course_code, course_name, credits, instructor) VALUES
+lab06-# ('CS101', 'Introduction to Programming', 3, 'Dr. Brown'),
+lab06-# ('CS201', 'Data Structures', 4, 'Dr. Davis'),
+lab06-# ('MATH101', 'Calculus I', 4, 'Dr. Wilson');
+INSERT 0 3
+lab06=# INSERT INTO student_enrollments (student_id, course_id, grade) VALUES
+lab06-# (1, 1, 'A'),  -- Alice in CS101
+lab06-# (1, 2, 'B+'), -- Alice in CS201
+lab06-# (2, 1, 'A-'), -- Bob in CS101
+lab06-# (2, 3, 'B'),  -- Bob in MATH101
+lab06-# (3, 2, 'A'),  -- Carol in CS201
+lab06-# (3, 3, 'A-'); -- Carol in MATH101
+INSERT 0 6
+lab06=# SELECT
+lab06-#     s.first_name || ' ' || s.last_name AS student_name,
+lab06-#     c.course_code,
+lab06-#     c.course_name,
+lab06-#     se.grade,
+lab06-#     se.enrollment_date
+lab06-# FROM students s
+lab06-# JOIN student_enrollments se ON s.student_id = se.student_id
+lab06-# JOIN courses c ON se.course_id = c.course_id
+lab06-# ORDER BY s.last_name, c.course_code;
+ student_name  | course_code |         course_name         | grade | enrollment_date
+---------------+-------------+-----------------------------+-------+-----------------
+ Alice Johnson | CS101       | Introduction to Programming | A     | 2025-10-22
+ Alice Johnson | CS201       | Data Structures             | B+    | 2025-10-22
+ Bob Smith     | CS101       | Introduction to Programming | A-    | 2025-10-22
+ Bob Smith     | MATH101     | Calculus I                  | B     | 2025-10-22
+ Carol Wilson  | CS201       | Data Structures             | A     | 2025-10-22
+ Carol Wilson  | MATH101     | Calculus I                  | A-    | 2025-10-22
+(6 rows)
+
+
+lab06=#
+lab06=# -- Find all students in a specific course
+lab06=# SELECT s.first_name, s.last_name, se.grade
+lab06-# FROM students s
+lab06-# JOIN student_enrollments se ON s.student_id = se.student_id
+lab06-# JOIN courses c ON se.course_id = c.course_id
+lab06-# WHERE c.course_code = 'CS101';
+ first_name | last_name | grade
+------------+-----------+-------
+ Alice      | Johnson   | A
+ Bob        | Smith     | A-
+(2 rows)
+
+
+lab06=#
+lab06=# -- Find all courses for a specific student
+lab06=# SELECT c.course_code, c.course_name, c.credits, se.grade
+lab06-# FROM courses c
+lab06-# JOIN student_enrollments se ON c.course_id = se.course_id
+lab06-# JOIN students s ON se.student_id = s.student_id
+lab06-# WHERE s.email = 'alice@university.edu';
+ course_code |         course_name         | credits | grade
+-------------+-----------------------------+---------+-------
+ CS101       | Introduction to Programming |       3 | A
+ CS201       | Data Structures             |       4 | B+
+(2 rows)
+
+
+lab06=#
