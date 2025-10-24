@@ -1,0 +1,192 @@
+postgres=# CREATE DATABASE Lab07;
+CREATE DATABASE
+postgres=# \c Lab07
+connection to server at "localhost" (::1), port 5432 failed: ВАЖНО:  база данных "Lab07" не существует
+Previous connection kept
+postgres=# \c lab07
+You are now connected to database "lab07" as user "postgres".
+lab07=# CREATE TABLE Students (
+lab07(#     student_id SERIAL PRIMARY KEY,
+lab07(#     first_name VARCHAR(50),
+lab07(#     last_name VARCHAR(50),
+lab07(#     birth_date DATE
+lab07(# );
+CREATE TABLE
+lab07=# INSERT INTO Students (first_name, last_name, birth_date)
+lab07-# VALUES ('Aibek', 'Sharshenov', '2002-05-12');
+INSERT 0 1
+lab07=# INSERT INTO Students (first_name, last_name, birth_date) VALUES
+lab07-# ('Ainura', 'Toktomamatova', '2001-09-23'),
+lab07-# ('Bakyt', 'Mamatov', '2003-01-15'),
+lab07-# ('Gulzat', 'Sultanova', '2002-07-30');
+INSERT 0 3
+lab07=# UPDATE Students
+lab07-# SET birth_date = '2002-05-15'
+lab07-# WHERE first_name = 'Aibek' AND last_name = 'Sharshenov';
+UPDATE 1
+lab07=# DELETE FROM Students
+lab07-# WHERE first_name = 'Gulzat' AND last_name = 'Sultanova';
+DELETE 1
+lab07=# DELETE FROM Students
+lab07-# WHERE birth_date < '2002-01-01';
+DELETE 1
+lab07=# COPY Students(first_name, last_name, birth_date)
+lab07-# FROM '/path/to/students.csv'
+lab07-# DELIMITER ','
+lab07-# CSV HEADER;,'
+ОШИБКА:  не удалось открыть файл "/path/to/students.csv" для чтения: No such file or directory
+HINT:  COPY FROM указывает серверному процессу PostgreSQL прочитать данные из файла. Возможно, на самом деле вам нужно клиентское средство, например, \copy в psql.
+lab07'# COPY Students(first_name, last_name, birth_date)
+lab07'# FROM 'C:\Users\S\Downloads'
+invalid command \Users
+Try \? for help.
+lab07-# COPY Students(first_name, last_name, birth_date)
+lab07-# FROM C:\Users\S\Downloads\Bio_csv.csv DELIMETER ',' CSV HEADER;
+invalid command \Users
+Try \? for help.
+lab07-# COPY Students(first_name, last_name, birth_date)
+lab07-# FROM '\Users\S\Downloads\Bio_csv.csv' DELIMETER ',' CSV HEADER;
+ОШИБКА:  ошибка синтаксиса (примерное положение: ",")
+LINE 1: ,'
+        ^
+lab07=# COPY Students(first_name, last_name, birth_date)
+lab07-# FROM '\Users\S\Downloads\Bio_csv.csv'
+lab07-# DELIMETER ','
+lab07-# CSV HEADER;
+ОШИБКА:  ошибка синтаксиса (примерное положение: "DELIMETER")
+LINE 3: DELIMETER ','
+        ^
+lab07=# COPY Students(first_name, last_name, birth_date)
+lab07-# FROM '\Users\S\Downloads\Bio_csv.csv'
+lab07-# WITH (FORMAT CSV, HEADER);
+ОШИБКА:  не удалось открыть файл "\Users\S\Downloads\Bio_csv.csv" для чтения: Permission denied
+HINT:  COPY FROM указывает серверному процессу PostgreSQL прочитать данные из файла. Возможно, на самом деле вам нужно клиентское средство, например, \copy в psql.
+lab07=# COPY Students(first_name, last_name, birth_date)
+lab07-# FROM '\Users\S\Downloads\Bio_csv.txt'
+lab07-# WITH (FORMAT CSV, HEADER);
+ОШИБКА:  не удалось открыть файл "\Users\S\Downloads\Bio_csv.txt" для чтения: Permission denied
+HINT:  COPY FROM указывает серверному процессу PostgreSQL прочитать данные из файла. Возможно, на самом деле вам нужно клиентское средство, например, \copy в psql.
+lab07=# COPY Students(first_name, last_name, birth_date)
+lab07-# FROM '\Temp\Bio_csv.txt'
+lab07-# WITH (FORMAT CSV, HEADER);
+COPY 59
+lab07=# \d Students
+                                         Table "public.students"
+   Column   |         Type          | Collation | Nullable |                   Default
+------------+-----------------------+-----------+----------+----------------------------------------------
+ student_id | integer               |           | not null | nextval('students_student_id_seq'::regclass)
+ first_name | character varying(50) |           |          |
+ last_name  | character varying(50) |           |          |
+ birth_date | date                  |           |          |
+Indexes:
+    "students_pkey" PRIMARY KEY, btree (student_id)
+
+
+lab07=# SELECT * FROM Students;
+ student_id | first_name  | last_name  | birth_date
+------------+-------------+------------+------------
+          3 | Bakyt       | Mamatov    | 2003-01-15
+          1 | Aibek       | Sharshenov | 2002-05-15
+          5 | Maria       | Garcia     | 1990-07-22
+          6 | Robert      | Johnson    | 1982-11-08
+          7 | Lisa        | Williams   | 1995-05-30
+          8 | Michael     | Brown      | 1978-09-14
+          9 | Sarah       | Davis      | 1988-12-03
+         10 | David       | Miller     | 1992-02-18
+         11 | Jennifer    | Wilson     | 1987-06-25
+         12 | Christopher | Moore      | 1980-04-11
+         13 | Amanda      | Taylor     | 1993-08-19
+         14 | Daniel      | Anderson   | 1975-01-27
+         15 | Jessica     | Thomas     | 1991-10-05
+         16 | Matthew     | Jackson    | 1983-07-12
+         17 | Elizabeth   | White      | 1986-03-28
+         18 | Joshua      | Harris     | 1994-09-02
+         19 | Michelle    | Martin     | 1989-11-15
+         20 | Andrew      | Thompson   | 1981-04-23
+         21 | Stephanie   | Garcia     | 1996-12-08
+         22 | Kevin       | Martinez   | 1979-06-17
+         23 | Nicole      | Robinson   | 1990-02-14
+         24 | Brian       | Clark      | 1984-08-09
+         25 | Rebecca     | Rodriguez  | 1987-05-21
+         26 | Jonathan    | Lewis      | 1992-10-31
+         27 | Samantha    | Lee        | 1988-07-04
+         28 | Steven      | Walker     | 1980-01-12
+lab07=# UPDATE Students
+lab07-# SET last_name = 'DAUGHTER'
+lab07-# WHERE last_name IN ('son');
+UPDATE 0
+lab07=# UPDATE Students
+lab07-# SET last_name = 'DAUGHTER'
+lab07-# WHERE last_name IN ('Anderson', 'Jackson');
+UPDATE 2
+lab07=# SELECT * FROM Students;
+ student_id | first_name  | last_name  | birth_date
+------------+-------------+------------+------------
+          3 | Bakyt       | Mamatov    | 2003-01-15
+          1 | Aibek       | Sharshenov | 2002-05-15
+          5 | Maria       | Garcia     | 1990-07-22
+          6 | Robert      | Johnson    | 1982-11-08
+          7 | Lisa        | Williams   | 1995-05-30
+          8 | Michael     | Brown      | 1978-09-14
+          9 | Sarah       | Davis      | 1988-12-03
+         10 | David       | Miller     | 1992-02-18
+         11 | Jennifer    | Wilson     | 1987-06-25
+         12 | Christopher | Moore      | 1980-04-11
+         13 | Amanda      | Taylor     | 1993-08-19
+         15 | Jessica     | Thomas     | 1991-10-05
+         17 | Elizabeth   | White      | 1986-03-28
+         18 | Joshua      | Harris     | 1994-09-02
+         19 | Michelle    | Martin     | 1989-11-15
+         20 | Andrew      | Thompson   | 1981-04-23
+         21 | Stephanie   | Garcia     | 1996-12-08
+         22 | Kevin       | Martinez   | 1979-06-17
+         23 | Nicole      | Robinson   | 1990-02-14
+         24 | Brian       | Clark      | 1984-08-09
+         25 | Rebecca     | Rodriguez  | 1987-05-21
+         26 | Jonathan    | Lewis      | 1992-10-31
+         27 | Samantha    | Lee        | 1988-07-04
+         28 | Steven      | Walker     | 1980-01-12
+         29 | Lauren      | Hall       | 1993-03-26
+         30 | Timothy     | Allen      | 1977-11-19
+         31 | Megan       | Young      | 1995-04-07
+         32 | Richard     | King       | 1982-09-23
+         33 | Christina   | Wright     | 1989-08-16
+         34 | Thomas      | Scott      | 1986-12-11
+         35 | Rachel      | Green      | 1991-06-28
+         36 | Charles     | Adams      | 1978-02-05
+         37 | Heather     | Baker      | 1994-01-18
+         38 | Patrick     | Nelson     | 1983-10-22
+         39 | Amber       | Carter     | 1988-04-09
+         40 | Mark        | Mitchell   | 1981-07-31
+         41 | Danielle    | Perez      | 1990-11-26
+         42 | Jason       | Roberts    | 1976-05-14
+         43 | Tiffany     | Turner     | 1993-09-08
+         44 | Ryan        | Phillips   | 1985-12-25
+         45 | Vanessa     | Campbell   | 1987-02-17
+         46 | Jacob       | Parker     | 1992-08-03
+         47 | Kayla       | Evans      | 1989-03-12
+         48 | Nicholas    | Edwards    | 1984-06-19
+         49 | Brittany    | Collins    | 1991-10-30
+         50 | Alexander   | Stewart    | 1979-04-05
+         51 | Victoria    | Sanchez    | 1996-07-21
+         52 | Tyler       | Morris     | 1988-01-09
+         53 | Courtney    | Rogers     | 1993-05-16
+         54 | Brandon     | Reed       | 1982-11-11
+         55 | Crystal     | Cook       | 1987-09-24
+         56 | Justin      | Morgan     | 1980-08-07
+         57 | Erica       | Bell       | 1994-12-14
+         58 | Austin      | Murphy     | 1986-03-02
+         59 | Alexis      | Bailey     | 1991-04-27
+         60 | Kyle        | Rivera     | 1983-10-08
+         61 | Hannah      | Cox        | 1989-07-19
+         62 | Aaron       | Howard     | 1977-12-22
+         63 | Mariah      | Ward       | 1995-02-03
+         14 | Daniel      | DAUGHTER   | 1975-01-27
+         16 | Matthew     | DAUGHTER   | 1983-07-12
+(61 rows)
+
+lab07=#
+lab07=# DELETE FROM Students
+lab07-# WHERE student_id IN (2, 3, 5);
+DELETE 2
+lab07=#
