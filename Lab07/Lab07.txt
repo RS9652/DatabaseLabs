@@ -1,0 +1,167 @@
+C:\Users\S>cd C:\Program Files\PostgreSQL\17\bin
+
+C:\Program Files\PostgreSQL\17\bin>psql -U postgres
+Password for user postgres:
+psql (17.6)
+WARNING: Console code page (866) differs from Windows code page (1251)
+         8-bit characters might not work correctly. See psql reference
+         page "Notes for Windows users" for details.
+Type "help" for help.
+
+postgres=# CREATE TABLE students_bad( student_id INT PRIMARY KEY, name VARCHAR(100), phone_numbers TEXT );
+CREATE TABLE
+postgres=# CREATE TABLE students (student_id INT PRIMARY KEY, name VARCHAR(100));
+CREATE TABLE
+postgres=# CREATE TABLE student_phones ( student_id INT, phone_number VARCHAR(15), phone_type VARCHAR(20), PRIMARY KEY (student_id, phone_number), FOREIGN KEY (student_id) REFERENCES students(student_id));
+CREATE TABLE
+postgres=# CREATE TABLE enrollments_bad (
+postgres(#     student_id INT,
+postgres(#     course_id INT,
+postgres(#     course_name VARCHAR(100), -- Partial dependency!
+postgres(#     grade CHAR(2),
+postgres(#     PRIMARY KEY (student_id, course_id)
+postgres(# );
+CREATE TABLE
+postgres=# CREATE TABLE courses (
+postgres(#     course_id INT PRIMARY KEY,
+postgres(#     course_name VARCHAR(100),
+postgres(#     credits INT
+postgres(# );
+CREATE TABLE
+postgres=# CREATE TABLE enrollments (
+postgres(#     student_id INT,
+postgres(#     course_id INT,
+postgres(#     grade CHAR(2),
+postgres(#     PRIMARY KEY (student_id, course_id),
+postgres(#     FOREIGN KEY (student_id) REFERENCES students(student_id),
+postgres(#     FOREIGN KEY (course_id) REFERENCES courses(course_id)
+postgres(# );
+CREATE TABLE
+postgres=# CREATE TABLE students_bad (
+postgres(#     student_id INT PRIMARY KEY,
+postgres(#     name VARCHAR(100),
+postgres(#     department_id INT,
+postgres(#     department_name VARCHAR(100) -- Transitive dependency!
+postgres(# );
+ОШИБКА:  отношение "students_bad" уже существует
+postgres=# DROP TABLE students_bad;
+DROP TABLE
+postgres=# CREATE TABLE students_bad (
+postgres(#     student_id INT PRIMARY KEY,
+postgres(#     name VARCHAR(100),
+postgres(#     department_id INT,
+postgres(#     department_name VARCHAR(100) -- Transitive dependency!
+postgres(# );
+CREATE TABLE
+postgres=# CREATE TABLE departments (
+postgres(#     department_id INT PRIMARY KEY,
+postgres(#     department_name VARCHAR(100),
+postgres(#     department_head VARCHAR(100)
+postgres(# );
+CREATE TABLE
+postgres=# DROP TABLE students;
+ОШИБКА:  удалить объект таблица students нельзя, так как от него зависят другие объекты
+DETAIL:  ограничение student_phones_student_id_fkey в отношении таблица student_phones зависит от объекта таблица students
+ограничение enrollments_student_id_fkey в отношении таблица enrollments зависит от объекта таблица students
+HINT:  Для удаления зависимых объектов используйте DROP ... CASCADE.
+postgres=# \d
+              List of relations
+ Schema |      Name       | Type  |  Owner
+--------+-----------------+-------+----------
+ public | courses         | table | postgres
+ public | departments     | table | postgres
+ public | enrollments     | table | postgres
+ public | enrollments_bad | table | postgres
+ public | student_phones  | table | postgres
+ public | students        | table | postgres
+ public | students_bad    | table | postgres
+(7 rows)
+
+
+postgres=# DROP TABLE students CASCADE;
+ЗАМЕЧАНИЕ:  удаление распространяется на ещё 2 объекта
+DETAIL:  удаление распространяется на объект ограничение student_phones_student_id_fkey в отношении таблица student_phones
+удаление распространяется на объект ограничение enrollments_student_id_fkey в отношении таблица enrollments
+DROP TABLE
+postgres=# CREATE TABLE students (
+postgres(#     student_id INT PRIMARY KEY,
+postgres(#     name VARCHAR(100),
+postgres(#     department_id INT,
+postgres(#     FOREIGN KEY (department_id) REFERENCES departments(department_id)
+postgres(# );
+CREATE TABLE
+postgres=# CREATE TABLE authors (
+postgres(#     author_id SERIAL PRIMARY KEY,
+postgres(#     first_name VARCHAR(50) NOT NULL,
+postgres(#     last_name VARCHAR(50) NOT NULL,
+postgres(#     birth_date DATE
+postgres(# );
+CREATE TABLE
+postgres=#
+postgres=# CREATE TABLE books (
+postgres(#     book_id SERIAL PRIMARY KEY,
+postgres(#     title VARCHAR(200) NOT NULL,
+postgres(#     isbn VARCHAR(13) UNIQUE,
+postgres(#     publication_year INTEGER,
+postgres(#     available_copies INTEGER DEFAULT 1
+postgres(# );
+CREATE TABLE
+postgres=#
+postgres=# CREATE TABLE book_authors (
+postgres(#     book_id INTEGER,
+postgres(#     author_id INTEGER,
+postgres(#     PRIMARY KEY (book_id, author_id),
+postgres(#     FOREIGN KEY (book_id) REFERENCES books(book_id),
+postgres(#     FOREIGN KEY (author_id) REFERENCES authors(author_id)
+postgres(# );
+CREATE TABLE
+postgres=#
+postgres=# CREATE TABLE members (
+postgres(#     member_id SERIAL PRIMARY KEY,
+postgres(#     first_name VARCHAR(50) NOT NULL,
+postgres(#     last_name VARCHAR(50) NOT NULL,
+postgres(#     email VARCHAR(100) UNIQUE NOT NULL,
+postgres(#     phone VARCHAR(15),
+postgres(#     membership_date DATE DEFAULT CURRENT_DATE
+postgres(# );
+CREATE TABLE
+postgres=#
+postgres=# CREATE TABLE loans (
+postgres(#     loan_id SERIAL PRIMARY KEY,
+postgres(#     member_id INTEGER NOT NULL,
+postgres(#     book_id INTEGER NOT NULL,
+postgres(#     loan_date DATE DEFAULT CURRENT_DATE,
+postgres(#     due_date DATE NOT NULL,
+postgres(#     return_date DATE,
+postgres(#     late_fee DECIMAL(10,2) DEFAULT 0.00,
+postgres(#     FOREIGN KEY (member_id) REFERENCES members(member_id),
+postgres(#     FOREIGN KEY (book_id) REFERENCES books(book_id)
+postgres(# );INSERT INTO authors (first_name, last_name, birth_date) VALUES('George', 'Orwell', '1903-06-25'),('J.K.', 'Rowling', '1965-07-31'),('J.R.R.', 'Tolkien', '1892-01-03'),('Agatha', 'Christie', '1890-09-15'),('Stephen', 'King', '1947-09-21'),('Jane', 'Austen', '1775-12-16');
+CREATE TABLE
+INSERT 0 6
+postgres=# INSERT INTO books (title, isbn, publication_year, available_copies) VALUES('1984', '9780451524935', 1949, 3),('Animal Farm', '9780451526342', 1945, 2),('Harry Potter and the Sorcerer''s Stone', '9780439708180', 1997, 5),('The Hobbit', '9780547928227', 1937, 4),('Murder on the Orient Express', '9780062693662', 1934, 2),('Pride and Prejudice', '9780141439518', 1813, 3),('The Shining', '9780307743657', 1977, 2);
+INSERT 0 7
+postgres=# INSERT INTO book_authors (book_id, author_id) VALUES(1, 1),(2, 1),(3, 2),(4, 3),(5, 4),(6, 6),(7, 5);
+INSERT 0 7
+postgres=# INSERT INTO members (first_name, last_name, email, phone, membership_date) VALUES('John', 'Smith', 'john.smith@email.com', '555-0101', '2023-01-15'),('Sarah', 'Johnson', 'sarah.johnson@email.com', '555-0102', '2023-02-20'),('Michael', 'Brown', 'michael.brown@email.com', '555-0103', '2023-03-10'),('Emily', 'Davis', 'emily.davis@email.com', '555-0104', '2024-01-05'),('David', 'Wilson', 'david.wilson@email.com', '555-0105', '2024-01-18');
+INSERT 0 5
+postgres=# INSERT INTO loans (member_id, book_id, loan_date, due_date, return_date, late_fee) VALUES(1, 1, '2024-01-10', '2024-01-24', '2024-01-22', 0.00),(2, 3, '2024-01-12', '2024-01-26', NULL, 0.00),(3, 4, '2024-01-05', '2024-01-19', '2024-01-25', 3.00),(1, 2, '2024-01-20', '2024-02-03', NULL, 0.00),(4, 6, '2024-01-15', '2024-01-29', NULL, 0.00);
+INSERT 0 5
+postgres=# SELECT b.title, b.publication_year, a.first_name, a.last_nameFROM books bJOIN book_authors ba ON b.book_id = ba.book_idJOIN authors a ON ba.author_id = a.author_idORDER BY b.title;
+ОШИБКА:  ошибка синтаксиса (примерное положение: "bJOIN")
+LINE 1: ...ication_year, a.first_name, a.last_nameFROM books bJOIN book...
+                                                             ^
+postgres=# SELECT b.title, b.publication_year, a.first_name, a.last_name FROM books b JOIN book_authors ba ON b.book_id = ba.book_id JOIN authors a ON ba.author_id = a.author_id ORDER BY b.title;
+                 title                 | publication_year | first_name | last_name
+---------------------------------------+------------------+------------+-----------
+ 1984                                  |             1949 | George     | Orwell
+ Animal Farm                           |             1945 | George     | Orwell
+ Harry Potter and the Sorcerer's Stone |             1997 | J.K.       | Rowling
+ Murder on the Orient Express          |             1934 | Agatha     | Christie
+ Pride and Prejudice                   |             1813 | Jane       | Austen
+ The Hobbit                            |             1937 | J.R.R.     | Tolkien
+ The Shining                           |             1977 | Stephen    | King
+(7 rows)
+
+
+postgres=#
