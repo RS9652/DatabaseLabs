@@ -1,0 +1,51 @@
+Microsoft Windows [Version 10.0.19045.6456]
+(c) Корпорация Майкрософт (Microsoft Corporation). Все права защищены.
+
+C:\Users\S>cd C:\Program Files\PostgreSQL\17\bin
+
+C:\Program Files\PostgreSQL\17\bin>psql -U
+psql: option requires an argument -- U
+psql: hint: Try "psql --help" for more information.
+
+C:\Program Files\PostgreSQL\17\bin>psql -U postgres
+Password for user postgres:
+psql (17.6)
+WARNING: Console code page (866) differs from Windows code page (1251)
+         8-bit characters might not work correctly. See psql reference
+         page "Notes for Windows users" for details.
+Type "help" for help.
+
+postgres=# \dt
+              List of relations
+ Schema |      Name       | Type  |  Owner
+--------+-----------------+-------+----------
+ public | authors         | table | postgres
+ public | book_authors    | table | postgres
+ public | books           | table | postgres
+ public | courses         | table | postgres
+ public | departments     | table | postgres
+ public | enrollments     | table | postgres
+ public | enrollments_bad | table | postgres
+ public | loans           | table | postgres
+ public | members         | table | postgres
+ public | student_phones  | table | postgres
+ public | students        | table | postgres
+ public | students_bad    | table | postgres
+(12 rows)
+
+
+postgres=# \d authors
+                                         Table "public.authors"
+   Column   |         Type          | Collation | Nullable |                  Default
+------------+-----------------------+-----------+----------+--------------------------------------------
+ author_id  | integer               |           | not null | nextval('authors_author_id_seq'::regclass)
+ first_name | character varying(50) |           | not null |
+ last_name  | character varying(50) |           | not null |
+ birth_date | date                  |           |          |
+Indexes:
+    "authors_pkey" PRIMARY KEY, btree (author_id)
+Referenced by:
+    TABLE "book_authors" CONSTRAINT "book_authors_author_id_fkey" FOREIGN KEY (author_id) REFERENCES authors(author_id)
+
+
+postgres=#
