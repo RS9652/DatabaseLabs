@@ -29,8 +29,8 @@ except Exception as e:
 def clear_fields():
     global item_quantity, item_name, item_status
 
-    for i in ['item_quantity','item_name', 'item_status']:
-        exec (f"{i}.set('')")
+    for i in ['item_quantity', 'item_name', 'item_status']:
+        exec(f"{i}.set('')")
 
 
 def display_records():
@@ -66,6 +66,36 @@ def add_record():
             mb.showinfo("Success", "Record added successfully")
         except psycopg2.IntegrityError:
             mb.showerror("Error", f"An error occurred: {e}")
+
+def remove_record(tree_widget):
+	if not tree_widget.selection():
+		mb.showerror('Error!', 'Please select an item from the database')
+		return
+
+	current_item = tree_widget.focus()
+	values = tree_widget.item(current_item)
+	selection = values["values"]
+
+	cursor.execute('DELETE FROM item WHERE id=%s', (selection[0],))
+	connector.commit()
+
+	tree_widget.delete(current_item)
+
+	mb.showinfo('Done', 'The record you wanted deleted was successfully deleted.')
+
+	clear_and_display()
+
+
+def delete_inventory():
+    if mb.askyesno('Are you sure?',
+                   'Are you sure you want to delete the entire inventory?\n\nThis command cannot be reversed'):
+        tree.delete(*tree.get_children())
+
+        cursor.execute('DELETE FROM item')
+        connector.commit()
+    else:
+        return
+
 
 
 def on_click():
@@ -130,15 +160,6 @@ add_record_button.place(relx = 0.5, rely = 0.8, anchor = tk.CENTER)
 clear_fields_button= ttk.Button(left_frame, text="Clear fields", command=on_click, width = 20)
 clear_fields_button.place(relx = 0.5, rely = 0.9, anchor = tk.CENTER)
 
-delete_item_button = ttk.Button(right_top_frame, text="Delete item", command=on_click, width = 20)
-delete_item_button.place(relx = 0.15, rely = 0.5, anchor = tk.W)
-
-delete_all_inventory_button = ttk.Button(right_top_frame, text="Clear inventory", command=on_click, width = 20)
-delete_all_inventory_button.place(relx = 0.3, rely = 0.5, anchor = tk.W)
-
-update_record_button = ttk.Button(right_top_frame, text = "Update an item", command=on_click, width = 20)
-update_record_button.place(relx = 0.45, rely = 0.5, anchor = tk.W)
-
 #Left Frame Widgets
 tk.Label(left_frame, text = 'Item Name', font = lbl_font, bg = lf_bg, fg = lf_fg, width = 20).place(relx = 0.5, rely = 0.1, anchor = tk.CENTER)
 ttk.Entry(left_frame, font = entry_font, textvariable = item_name, width = 20).place(relx = 0.5, rely = 0.2, anchor = tk.CENTER)
@@ -146,16 +167,26 @@ ttk.Entry(left_frame, font = entry_font, textvariable = item_name, width = 20).p
 tk.Label(left_frame, text = 'Item Quantity', font = lbl_font, bg = lf_bg, fg = lf_fg, width = 20).place(relx = 0.5, rely = 0.3, anchor = tk.CENTER)
 ttk.Entry(left_frame, font = entry_font, textvariable = item_quantity, width = 20).place(relx = 0.5, rely = 0.4, anchor = tk.CENTER)
 
-tk.Label(left_frame, text = 'Item Status', font = lbl_font, bg = lf_bg, fg = lf_fg, width = 20).place(relx = 0.5, rely = 0.5, anchor = tk.CENTER)
-ttk.Entry(left_frame, font = entry_font, textvariable = item_status, width = 20).place(relx = 0.5, rely = 0.6, anchor = tk.CENTER)
+tk.Label(left_frame, text = 'Item Status', font = lbl_font, bg = lf_bg, fg = lf_fg).place(relx = 0.5, rely = 0.5, anchor = tk.CENTER)
+dd = tk.OptionMenu(left_frame, item_status, *['Available', 'Issued'])
+dd.configure(font=entry_font, width=15)
+dd.place(relx=0.5, rely=0.6, anchor=tk.CENTER)
 
 #Right top frame widgets
+delete_item_button = ttk.Button(right_top_frame, text="Delete item", command=lambda: remove_record(tree), width = 20)
+delete_item_button.place(relx = 0.10, rely = 0.35, anchor = tk.NW)
+
+delete_all_inventory_button = ttk.Button(right_top_frame, text="Clear inventory", command=lambda: delete_inventory(), width = 20)
+delete_all_inventory_button.place(relx = 0.4, rely = 0.35, anchor = tk.NW)
+
+update_record_button = ttk.Button(right_top_frame, text="Update an item", command=on_click(), width=20)
+update_record_button.place(relx=0.7, rely=0.35, anchor=tk.NW)
 
 
 #Right bottom frame widgets
 tk.Label(right_bottom_frame, text='ITEM INVENTORY', bg=rbf_bg, font=("Noto Sans CJK TC", 15, 'bold')).pack(side=tk.TOP, fill=tk.X, anchor=tk.CENTER)
  
-tree = ttk.Treeview(right_bottom_frame, selectmode=tk.BROWSE, columns=('Item ID', 'Item Name', 'Quantity', 'Status'), show='headings')
+tree = ttk.Treeview(right_bottom_frame, selectmode=tk.BROWSE, columns=('Item Name', 'Quantity', 'Owner', 'Status'), show='headings')
 XScrollbar = tk.Scrollbar(tree, orient=tk.HORIZONTAL, command=tree.xview)
 YScrollbar = tk.Scrollbar(tree, orient=tk.VERTICAL, command=tree.yview)
 
@@ -164,16 +195,16 @@ YScrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
 tree.config(xscrollcommand=XScrollbar.set, yscrollcommand=YScrollbar.set)
 
-tree.heading('Item ID', text='ID', anchor=tk.CENTER)
 tree.heading('Item Name', text='Item Name', anchor=tk.CENTER)
 tree.heading('Quantity', text='Quantity', anchor=tk.CENTER)
-tree.heading('Status', text='Status of the Item', anchor=tk.CENTER)
+tree.heading('Owner', text='Owner of Item', anchor=tk.CENTER)
+tree.heading('Status', text='Status of Item', anchor=tk.CENTER)
 
 tree.column('#0', width=0, stretch=tk.NO)
-tree.column('#1', width=30, stretch=tk.NO)
-tree.column('#2', width=80, stretch=tk.NO)
-tree.column('#3', width=120, stretch=tk.NO)
-tree.column('#4', width=200, stretch=tk.NO)
+tree.column('#1', width=210, stretch=tk.NO)
+tree.column('#2', width=130, stretch=tk.NO)
+tree.column('#3', width=210, stretch=tk.NO)
+tree.column('#4', width=130, stretch=tk.NO)
 
 tree.place(y=30, x=0, relheight=0.9, relwidth=1)
 
