@@ -21,3 +21,4 @@ Folders:
 
 Author: 
 Syimyk Rasulov
+<img width="452" height="372" alt="Снимок экрана 2025-12-14 205833" src="https://github.com/user-attachments/assets/a4f74407-8124-489d-a48b-a7121acf63ab" />
