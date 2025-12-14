@@ -12,7 +12,7 @@ try:
         host="localhost",           # e.g., "localhost" or an IP address
         database="postgres",
         user="postgres",
-        password="HokageYamm2004#",
+        password="",
         port="5432"                 # Default PostgreSQL port
     )
     print("Connection established")
