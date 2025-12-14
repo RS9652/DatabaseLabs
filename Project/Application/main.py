@@ -137,6 +137,7 @@ item_name = tk.StringVar()
 item_status = tk.StringVar()
 item_id = tk.StringVar()
 item_quantity = tk.IntVar()
+item_owner = tk.StringVar()
 
 label = tk.Label(root, text = "Warehouse Management System", font =('Arial',14,"bold"), bg=top_hl_bg, fg=top_hl_fg)
 label.pack(side = tk.TOP, fill = tk.X)
@@ -158,19 +159,22 @@ add_record_button = ttk.Button(left_frame, text="ADD RECORD", command=add_record
 add_record_button.place(relx = 0.5, rely = 0.8, anchor = tk.CENTER)
 
 clear_fields_button= ttk.Button(left_frame, text="Clear fields", command=on_click, width = 20)
-clear_fields_button.place(relx = 0.5, rely = 0.9, anchor = tk.CENTER)
+clear_fields_button.place(relx = 0.5, rely = 0.88, anchor = tk.CENTER)
 
 #Left Frame Widgets
 tk.Label(left_frame, text = 'Item Name', font = lbl_font, bg = lf_bg, fg = lf_fg, width = 20).place(relx = 0.5, rely = 0.1, anchor = tk.CENTER)
-ttk.Entry(left_frame, font = entry_font, textvariable = item_name, width = 20).place(relx = 0.5, rely = 0.2, anchor = tk.CENTER)
+ttk.Entry(left_frame, font = entry_font, textvariable = item_name, width = 20).place(relx = 0.5, rely = 0.15, anchor = tk.CENTER)
 
 tk.Label(left_frame, text = 'Item Quantity', font = lbl_font, bg = lf_bg, fg = lf_fg, width = 20).place(relx = 0.5, rely = 0.3, anchor = tk.CENTER)
-ttk.Entry(left_frame, font = entry_font, textvariable = item_quantity, width = 20).place(relx = 0.5, rely = 0.4, anchor = tk.CENTER)
+ttk.Entry(left_frame, font = entry_font, textvariable = item_quantity, width = 20).place(relx = 0.5, rely = 0.35, anchor = tk.CENTER)
 
-tk.Label(left_frame, text = 'Item Status', font = lbl_font, bg = lf_bg, fg = lf_fg).place(relx = 0.5, rely = 0.5, anchor = tk.CENTER)
-dd = tk.OptionMenu(left_frame, item_status, *['Available', 'Issued'])
+tk.Label(left_frame, text = 'Item Owner', font = lbl_font, bg = lf_bg, fg = lf_fg, width = 20).place(relx = 0.5, rely = 0.5, anchor = tk.CENTER)
+ttk.Entry(left_frame, font = entry_font, textvariable = item_owner, width = 20).place(relx = 0.5, rely = 0.55, anchor = tk.CENTER)
+
+tk.Label(left_frame, text = 'Item Status', font = lbl_font, bg = lf_bg, fg = lf_fg).place(relx = 0.5, rely = 0.65, anchor = tk.CENTER)
+dd = tk.OptionMenu(left_frame, item_status, *['In Stock', 'Issued'])
 dd.configure(font=entry_font, width=15)
-dd.place(relx=0.5, rely=0.6, anchor=tk.CENTER)
+dd.place(relx=0.5, rely=0.7, anchor=tk.CENTER)
 
 #Right top frame widgets
 delete_item_button = ttk.Button(right_top_frame, text="Delete item", command=lambda: remove_record(tree), width = 20)
@@ -179,7 +183,7 @@ delete_item_button.place(relx = 0.10, rely = 0.35, anchor = tk.NW)
 delete_all_inventory_button = ttk.Button(right_top_frame, text="Clear inventory", command=lambda: delete_inventory(), width = 20)
 delete_all_inventory_button.place(relx = 0.4, rely = 0.35, anchor = tk.NW)
 
-update_record_button = ttk.Button(right_top_frame, text="Update an item", command=on_click(), width=20)
+update_record_button = ttk.Button(right_top_frame, text="Update item", command=on_click(), width=20)
 update_record_button.place(relx=0.7, rely=0.35, anchor=tk.NW)
 
 

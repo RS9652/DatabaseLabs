@@ -246,10 +246,8 @@ clear.place(x=50, y=435)
 # Right Top Frame
 Button(RT_frame, text='Delete book record', font=btn_font, bg=btn_hlb_bg, width=17, command=remove_record).place(x=8, y=30)
 Button(RT_frame, text='Delete full inventory', font=btn_font, bg=btn_hlb_bg, width=17, command=delete_inventory).place(x=178, y=30)
-Button(RT_frame, text='Update book details', font=btn_font, bg=btn_hlb_bg, width=17,
-       command=update_record).place(x=348, y=30)
-Button(RT_frame, text='Change Book Availability', font=btn_font, bg=btn_hlb_bg, width=19,
-       command=change_availability).place(x=518, y=30)
+Button(RT_frame, text='Update book details', font=btn_font, bg=btn_hlb_bg, width=17, command=update_record).place(x=348, y=30)
+Button(RT_frame, text='Change Book Availability', font=btn_font, bg=btn_hlb_bg, width=19, command=change_availability).place(x=518, y=30)
 
 # Right Bottom Frame
 Label(RB_frame, text='BOOK INVENTORY', bg=rbf_bg, font=("Noto Sans CJK TC", 15, 'bold')).pack(side=TOP, fill=X)
