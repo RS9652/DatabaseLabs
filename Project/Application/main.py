@@ -1,10 +1,7 @@
-
 import tkinter as tk
 from tkinter import ttk as ttk
 import tkinter.messagebox as mb
-import tkinter.simpledialog as sb
 import psycopg2
-from gui_functions import *
 
 #Establish a connection to the PostGRE database
 try:
@@ -27,9 +24,9 @@ except Exception as e:
 
 #Functions
 def clear_fields():
-    global item_quantity, item_name, item_status
+    global item_quantity, item_name, item_status, item_owner
 
-    for i in ['item_quantity', 'item_name', 'item_status']:
+    for i in ['item_quantity', 'item_name', 'item_status', 'item_owner']:
         exec(f"{i}.set('')")
 
 
@@ -39,7 +36,7 @@ def display_records():
 
     tree.delete(*tree.get_children())
 
-    cursor.execute('SELECT id, name, quantity, item_status FROM item ORDER BY id')
+    cursor.execute('SELECT  id, name, quantity, owner, item_status FROM item ORDER BY id')
     data = cursor.fetchall()
 
     for records in data:
@@ -57,8 +54,8 @@ def add_record():
     if surety:
         try:
             cursor.execute(
-                'INSERT INTO item (name, quantity, item_status) VALUES (%s, %s, %s)',
-                (item_name.get(), item_quantity.get(), item_status.get())
+                'INSERT INTO item (name, quantity, item_status, owner) VALUES (%s, %s, %s, %s)',
+                (item_name.get(), item_quantity.get(), item_status.get(), item_owner.get())
             )
             connector.commit()
             clear_and_display()
@@ -96,7 +93,27 @@ def delete_inventory():
     else:
         return
 
+def change_status():
+    global cursor, connector, tree
 
+    if not tree.selection():
+        mb.showerror('Error!', 'Please select an item from the database')
+        return
+
+    current_item = tree.focus()
+    values = tree.item(current_item)
+    selection = values["values"]
+    item_id = values["values"][0]
+
+
+    surety = mb.askyesno('Was an item Issued?', 'Are you sure you want to change the status of this item?')
+    if surety:
+        cursor.execute('UPDATE item SET item_status = %s WHERE id = %s',('Issued', item_id))
+        connector.commit()
+    else:
+        return
+
+    clear_and_display()
 
 def on_click():
     print("DA")
@@ -183,14 +200,14 @@ delete_item_button.place(relx = 0.10, rely = 0.35, anchor = tk.NW)
 delete_all_inventory_button = ttk.Button(right_top_frame, text="Clear inventory", command=lambda: delete_inventory(), width = 20)
 delete_all_inventory_button.place(relx = 0.4, rely = 0.35, anchor = tk.NW)
 
-update_record_button = ttk.Button(right_top_frame, text="Update item", command=on_click(), width=20)
+update_record_button = ttk.Button(right_top_frame, text="Update Status", command=change_status, width=20)
 update_record_button.place(relx=0.7, rely=0.35, anchor=tk.NW)
 
 
 #Right bottom frame widgets
 tk.Label(right_bottom_frame, text='ITEM INVENTORY', bg=rbf_bg, font=("Noto Sans CJK TC", 15, 'bold')).pack(side=tk.TOP, fill=tk.X, anchor=tk.CENTER)
  
-tree = ttk.Treeview(right_bottom_frame, selectmode=tk.BROWSE, columns=('Item Name', 'Quantity', 'Owner', 'Status'), show='headings')
+tree = ttk.Treeview(right_bottom_frame, selectmode=tk.BROWSE, columns=('Id', 'Item Name', 'Quantity', 'Owner', 'Status'), show='headings')
 XScrollbar = tk.Scrollbar(tree, orient=tk.HORIZONTAL, command=tree.xview)
 YScrollbar = tk.Scrollbar(tree, orient=tk.VERTICAL, command=tree.yview)
 
@@ -199,16 +216,19 @@ YScrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
 tree.config(xscrollcommand=XScrollbar.set, yscrollcommand=YScrollbar.set)
 
+
+tree.heading('Id', text='ID', anchor=tk.CENTER)
 tree.heading('Item Name', text='Item Name', anchor=tk.CENTER)
 tree.heading('Quantity', text='Quantity', anchor=tk.CENTER)
 tree.heading('Owner', text='Owner of Item', anchor=tk.CENTER)
 tree.heading('Status', text='Status of Item', anchor=tk.CENTER)
 
 tree.column('#0', width=0, stretch=tk.NO)
-tree.column('#1', width=210, stretch=tk.NO)
-tree.column('#2', width=130, stretch=tk.NO)
-tree.column('#3', width=210, stretch=tk.NO)
-tree.column('#4', width=130, stretch=tk.NO)
+tree.column('#1', width=0, stretch=tk.NO)
+tree.column('#2', width=210, stretch=tk.NO)
+tree.column('#3', width=130, stretch=tk.NO)
+tree.column('#4', width=210, stretch=tk.NO)
+tree.column('#5', width=130, stretch=tk.NO)
 
 tree.place(y=30, x=0, relheight=0.9, relwidth=1)
 
