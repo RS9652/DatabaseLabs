@@ -94,6 +94,9 @@ python main.py
 
 🖼️ User Interface Overview
 
+Here is how the GUI looks:
+![img.png](img.png)
+
 Left Panel: Add new inventory items
 
 Top Right Panel: Delete items, clear inventory, update status
