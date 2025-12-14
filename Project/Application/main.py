@@ -120,7 +120,6 @@ def on_click():
 def on_resize(event):
     current_width = root.winfo_width()
     current_height = root.winfo_height()
-    #print(f"Current window size: {current_width}x{current_height}")TODO in case of any error remove #
     # Update your UI elements here
     left_frame.place_configure(y=current_height * 0.1)  # Example: 10% from top
     right_top_frame.place_configure(x=current_width * 0.3, y=current_height * 0.1)
