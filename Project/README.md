@@ -35,6 +35,8 @@ psycopg2 – PostgreSQL database adapter for Python
 🗄️ Database Structure
 Diagram:
 <img width="570" height="535" alt="ERD (2)" src="https://github.com/user-attachments/assets/fb7a2cf5-3df2-449b-b138-a021483cdacc" />
+
+
 Tables:
 customers
 sectors
@@ -167,6 +169,7 @@ python main.py
 
 Here is how the GUI looks:
 <img width="1516" height="841" alt="изображение" src="https://github.com/user-attachments/assets/8bba8c4c-42f0-4846-b9f2-010e665f5e90" />
+
 
 Left Panel: Add new inventory items
 
