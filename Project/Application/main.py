@@ -24,9 +24,9 @@ except Exception as e:
 
 #Functions
 def clear_fields():
-    global item_quantity, item_name, item_status, item_owner
+    global item_quantity, item_name, item_status, item_owner, item_id
 
-    for i in ['item_quantity', 'item_name', 'item_status', 'item_owner']:
+    for i in ['item_quantity', 'item_name', 'item_status', 'item_owner', 'item_id']:
         exec(f"{i}.set('')")
 
 
@@ -36,7 +36,7 @@ def display_records():
 
     tree.delete(*tree.get_children())
 
-    cursor.execute('SELECT  id, name, quantity, owner, item_status FROM item ORDER BY id')
+    cursor.execute('SELECT i.id, i.name, i.quantity, c.name AS customer_name, i.item_status, s.name AS sector_name FROM item i LEFT JOIN customers c ON i.id = c.id LEFT JOIN sectors s ON i.fk_sector_id = s.id;')
     data = cursor.fetchall()
 
     for records in data:
@@ -48,14 +48,23 @@ def clear_and_display():
     display_records()
 def add_record():
     global cursor
-    global item_name, item_id, item_status, item_quantity
+    global item_name, item_id, item_status, item_quantity, sector
 
     surety = mb.askyesno("Confirmation", "Are you sure you want to add this record?")
     if surety:
         try:
+            cursor.execute('INSERT INTO customers(id, name) VALUES (%s, %s)', (item_id.get(), item_owner.get()))
+
+            #Inserting into sector
+            sector_id = 3  # default to 'C'
+            if sector.get() == 'A':
+                sector_id = 1
+            elif sector.get() == 'B':
+                sector_id = 2
+
             cursor.execute(
-                'INSERT INTO item (name, quantity, item_status, owner) VALUES (%s, %s, %s, %s)',
-                (item_name.get(), item_quantity.get(), item_status.get(), item_owner.get())
+                'INSERT INTO item (id,name, quantity, item_status, fk_owner_id, fk_sector_id) VALUES (%s,%s, %s, %s, %s, %s)',
+                (item_id.get(), item_name.get(), item_quantity.get(), item_status.get(), item_id.get(), sector_id)
             )
             connector.commit()
             clear_and_display()
@@ -89,6 +98,7 @@ def delete_inventory():
         tree.delete(*tree.get_children())
 
         cursor.execute('DELETE FROM item')
+        cursor.execute('DELETE FROM customers')
         connector.commit()
     else:
         return
@@ -154,6 +164,7 @@ item_status = tk.StringVar()
 item_id = tk.StringVar()
 item_quantity = tk.IntVar()
 item_owner = tk.StringVar()
+sector = tk.StringVar()
 
 label = tk.Label(root, text = "Warehouse Management System", font =('Arial',14,"bold"), bg=top_hl_bg, fg=top_hl_fg)
 label.pack(side = tk.TOP, fill = tk.X)
@@ -172,25 +183,33 @@ right_bottom_frame.place(relx=0.3, rely=0.3, relheight=0.785, relwidth=0.7)
 
 #Butons
 add_record_button = ttk.Button(left_frame, text="ADD RECORD", command=add_record, width = 20)
-add_record_button.place(relx = 0.5, rely = 0.8, anchor = tk.CENTER)
+add_record_button.place(relx = 0.05, rely = 0.88, anchor = tk.W)
 
-clear_fields_button= ttk.Button(left_frame, text="Clear fields", command=on_click, width = 20)
-clear_fields_button.place(relx = 0.5, rely = 0.88, anchor = tk.CENTER)
+clear_fields_button= ttk.Button(left_frame, text="Clear fields", command=clear_fields, width = 20)
+clear_fields_button.place(relx = 0.52, rely = 0.88, anchor = tk.W)
 
 #Left Frame Widgets
-tk.Label(left_frame, text = 'Item Name', font = lbl_font, bg = lf_bg, fg = lf_fg, width = 20).place(relx = 0.5, rely = 0.1, anchor = tk.CENTER)
-ttk.Entry(left_frame, font = entry_font, textvariable = item_name, width = 20).place(relx = 0.5, rely = 0.15, anchor = tk.CENTER)
+tk.Label(left_frame, text = 'Item Name', font = lbl_font, bg = lf_bg, fg = lf_fg, width = 20).place(relx = 0.5, rely = 0.15, anchor = tk.CENTER)
+ttk.Entry(left_frame, font = entry_font, textvariable = item_name, width = 20).place(relx = 0.5, rely = 0.2, anchor = tk.CENTER)
 
-tk.Label(left_frame, text = 'Item Quantity', font = lbl_font, bg = lf_bg, fg = lf_fg, width = 20).place(relx = 0.5, rely = 0.3, anchor = tk.CENTER)
-ttk.Entry(left_frame, font = entry_font, textvariable = item_quantity, width = 20).place(relx = 0.5, rely = 0.35, anchor = tk.CENTER)
+tk.Label(left_frame, text = 'Item ID', font = lbl_font, bg = lf_bg, fg = lf_fg, width = 20).place(relx = 0.5, rely = 0.3, anchor = tk.CENTER)
+ttk.Entry(left_frame, font = entry_font, textvariable = item_id, width = 20).place(relx = 0.5, rely = 0.35, anchor = tk.CENTER)
 
-tk.Label(left_frame, text = 'Item Owner', font = lbl_font, bg = lf_bg, fg = lf_fg, width = 20).place(relx = 0.5, rely = 0.5, anchor = tk.CENTER)
-ttk.Entry(left_frame, font = entry_font, textvariable = item_owner, width = 20).place(relx = 0.5, rely = 0.55, anchor = tk.CENTER)
+tk.Label(left_frame, text = 'Item Quantity', font = lbl_font, bg = lf_bg, fg = lf_fg, width = 20).place(relx = 0.5, rely = 0.45, anchor = tk.CENTER)
+ttk.Entry(left_frame, font = entry_font, textvariable = item_quantity, width = 20).place(relx = 0.5, rely = 0.5, anchor = tk.CENTER)
 
-tk.Label(left_frame, text = 'Item Status', font = lbl_font, bg = lf_bg, fg = lf_fg).place(relx = 0.5, rely = 0.65, anchor = tk.CENTER)
+tk.Label(left_frame, text = 'Item Owner', font = lbl_font, bg = lf_bg, fg = lf_fg, width = 20).place(relx = 0.5, rely = 0.6, anchor = tk.CENTER)
+ttk.Entry(left_frame, font = entry_font, textvariable = item_owner, width = 20).place(relx = 0.5, rely = 0.65, anchor = tk.CENTER)
+
+tk.Label(left_frame, text = 'Item Status', font = lbl_font, bg = lf_bg, fg = lf_fg).place(relx = 0.1, rely = 0.74, anchor = tk.W)
+tk.Label(left_frame, text = 'Sector', font = lbl_font, bg = lf_bg, fg = lf_fg).place(relx = 0.63, rely = 0.74, anchor = tk.W)
 dd = tk.OptionMenu(left_frame, item_status, *['In Stock', 'Issued'])
-dd.configure(font=entry_font, width=15)
-dd.place(relx=0.5, rely=0.7, anchor=tk.CENTER)
+dd.configure(font=entry_font, width=10)
+dd.place(relx=0.05, rely=0.8, anchor=tk.W)
+
+sector_option = tk.OptionMenu(left_frame, sector, *['A', 'B', 'C'])
+sector_option.configure(font=entry_font, width=10)
+sector_option.place(relx=0.52, rely=0.8, anchor=tk.W)
 
 #Right top frame widgets
 delete_item_button = ttk.Button(right_top_frame, text="Delete item", command=lambda: remove_record(tree), width = 20)
@@ -206,7 +225,7 @@ update_record_button.place(relx=0.7, rely=0.35, anchor=tk.NW)
 #Right bottom frame widgets
 tk.Label(right_bottom_frame, text='ITEM INVENTORY', bg=rbf_bg, font=("Noto Sans CJK TC", 15, 'bold')).pack(side=tk.TOP, fill=tk.X, anchor=tk.CENTER)
  
-tree = ttk.Treeview(right_bottom_frame, selectmode=tk.BROWSE, columns=('Id', 'Item Name', 'Quantity', 'Owner', 'Status'), show='headings')
+tree = ttk.Treeview(right_bottom_frame, selectmode=tk.BROWSE, columns=('Id', 'Item Name', 'Quantity', 'Owner', 'Status', 'Sector'), show='headings')
 XScrollbar = tk.Scrollbar(tree, orient=tk.HORIZONTAL, command=tree.xview)
 YScrollbar = tk.Scrollbar(tree, orient=tk.VERTICAL, command=tree.yview)
 
@@ -221,13 +240,15 @@ tree.heading('Item Name', text='Item Name', anchor=tk.CENTER)
 tree.heading('Quantity', text='Quantity', anchor=tk.CENTER)
 tree.heading('Owner', text='Owner of Item', anchor=tk.CENTER)
 tree.heading('Status', text='Status of Item', anchor=tk.CENTER)
+tree.heading('Sector', text='Sector', anchor=tk.CENTER)
 
 tree.column('#0', width=0, stretch=tk.NO)
-tree.column('#1', width=0, stretch=tk.NO)
+tree.column('#1', width=20, stretch=tk.NO)
 tree.column('#2', width=210, stretch=tk.NO)
-tree.column('#3', width=130, stretch=tk.NO)
-tree.column('#4', width=210, stretch=tk.NO)
+tree.column('#3', width=75, stretch=tk.NO)
+tree.column('#4', width=200, stretch=tk.NO)
 tree.column('#5', width=130, stretch=tk.NO)
+tree.column('#6', width=50, stretch=tk.NO)
 
 tree.place(y=30, x=0, relheight=0.9, relwidth=1)
 

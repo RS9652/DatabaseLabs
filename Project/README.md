@@ -32,17 +32,88 @@ PostgreSQL – Relational database
 
 psycopg2 – PostgreSQL database adapter for Python
 
-🗃️ Database Structure
+🗄️ Database Structure
+Diagram:
+[Downloads](..%2F..%2F..%2FDownloads)
+Tables:
+customers
+sectors
+item
 
-The application connects to a PostgreSQL database named warehouse and operates on an item table with fields similar to:
+Relationships:
+item.fk_owner_id → customers.id
+item.fk_sector_id → sectors.id
 
+✅ SQL: Create Database Schema
+1️⃣ (Optional) Create Database
+CREATE DATABASE warehouse;
+
+\c warehouse;
+
+2️⃣ Customers Table
+CREATE TABLE customers (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    address VARCHAR(100),
+    phone VARCHAR(100)
+);
+
+3️⃣ Sectors Table
+CREATE TABLE sectors (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(1) NOT NULL
+);
+
+
+⚠️ VARCHAR(1) matches the diagram exactly (sector names like A, B, C)
+
+4️⃣ Item Table
 CREATE TABLE item (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100),
-    quantity INT,
-    owner VARCHAR(100),
-    item_status VARCHAR(50)
+    name VARCHAR(100) NOT NULL,
+    quantity INTEGER NOT NULL CHECK (quantity >= 0),
+    item_status VARCHAR(20),
+
+    fk_owner_id INTEGER NOT NULL,
+    fk_sector_id INTEGER NOT NULL,
+
+    CONSTRAINT fk_item_owner
+        FOREIGN KEY (fk_owner_id)
+        REFERENCES customers(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_item_sector
+        FOREIGN KEY (fk_sector_id)
+        REFERENCES sectors(id)
+        ON DELETE CASCADE
 );
+
+
+🔗 ER Relationship Summary
+customers (1) ────< item >──── (1) sectors
+
+
+One customer → many items
+One sector → many items
+Each item belongs to one customer and one sector
+
+🧪 Example Inserts (Optional)
+INSERT INTO customers (name, address, phone)
+VALUES ('John Doe', 'Main Street 12', '555-1234');
+
+INSERT INTO sectors (name)
+VALUES ('A'), ('B'), ('C');
+
+INSERT INTO item (name, quantity, item_status, fk_owner_id, fk_sector_id)
+VALUES ('Laptop', 10, 'In Stock', 1, 1);
+
+✅ Normalization Check
+
+1NF: Atomic values ✔
+
+2NF: No partial dependency ✔
+
+3NF: No transitive dependency ✔
 
 ⚙️ How It Works
 
@@ -102,19 +173,3 @@ Left Panel: Add new inventory items
 Top Right Panel: Delete items, clear inventory, update status
 
 Bottom Right Panel: Inventory table with scrollbars
-
-📌 Future Improvements
-
-Input validation and error handling
-
-Search and filter functionality
-
-User authentication
-
-Export inventory to CSV/PDF
-
-Responsive window resizing
-
-📄 License
-
-This project is for educational purposes and can be freely modified and extended.
