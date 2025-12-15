@@ -34,7 +34,7 @@ psycopg2 – PostgreSQL database adapter for Python
 
 🗄️ Database Structure
 Diagram:
-![Database ER Diagram](images/ERD (2).png)
+![Database ER Diagram](images/ERD(2).png)
 Tables:
 customers
 sectors
