@@ -166,7 +166,6 @@ python main.py
 🖼️ User Interface Overview
 
 Here is how the GUI looks:
-![img.png](img.png)
 
 Left Panel: Add new inventory items
 
