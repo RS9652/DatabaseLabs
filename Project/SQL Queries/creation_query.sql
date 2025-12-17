@@ -17,3 +17,15 @@ CREATE TABLE item (
         REFERENCES sectors(id)
         ON DELETE CASCADE
 );
+
+CREATE TABLE customers (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    address VARCHAR(100),
+    phone VARCHAR(100)
+);
+
+CREATE TABLE sectors (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(1) NOT NULL
+);

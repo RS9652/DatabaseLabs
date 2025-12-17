@@ -71,25 +71,25 @@ def add_record():
 
             mb.showinfo("Success", "Record added successfully")
         except psycopg2.IntegrityError:
-            mb.showerror("Error", f"An error occurred: {e}")
+            mb.showerror("Error", 'The ID you provided already in use, please select unique ID')
+
+
 
 def remove_record(tree_widget):
-	if not tree_widget.selection():
-		mb.showerror('Error!', 'Please select an item from the database')
-		return
+    if not tree_widget.selection():
+        mb.showerror('Error!', 'Please select an item from the database')
+        return
+    current_item = tree_widget.focus()
+    values = tree_widget.item(current_item)
+    selection = values["values"]
 
-	current_item = tree_widget.focus()
-	values = tree_widget.item(current_item)
-	selection = values["values"]
+    cursor.execute('DELETE FROM item WHERE id=%s', (selection[0],))
+    cursor.execute('DELETE FROM customers WHERE id=%s', (selection[0],))
+    connector.commit()
 
-	cursor.execute('DELETE FROM item WHERE id=%s', (selection[0],))
-	connector.commit()
-
-	tree_widget.delete(current_item)
-
-	mb.showinfo('Done', 'The record you wanted deleted was successfully deleted.')
-
-	clear_and_display()
+    tree_widget.delete(current_item)
+    mb.showinfo('Done', 'The record you wanted deleted was successfully deleted.')
+    clear_and_display()
 
 
 def delete_inventory():
@@ -149,9 +149,9 @@ top_hl_fg = 'White'
 lf_bg = 'DeepSkyBlue' # Left Frame Background Color
 lf_fg = 'White'
 rtf_bg = 'Blue'
-rtf_fg = '' #TODO pick color
+rtf_fg = ''
 rbf_bg = 'White'
-rbf_fg = 'Black'#TODO pick color
+rbf_fg = 'Black'
 
 #Font
 lbl_font = ('Georgia', 13)  # Font for all labels
