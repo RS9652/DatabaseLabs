@@ -1,0 +1,334 @@
+Microsoft Windows [Version 10.0.19045.6466]
+(c) Корпорация Майкрософт (Microsoft Corporation). Все права защищены.
+
+C:\Users\S>cd C:\Program Files\PostgreSQL\17\bin
+
+C:\Program Files\PostgreSQL\17\bin>psql -U posgres
+Password for user posgres:
+psql: error: connection to server at "localhost" (::1), port 5432 failed: ВАЖНО:  пользователь "posgres" не прошёл проверку подлинности (по паролю)
+
+C:\Program Files\PostgreSQL\17\bin>psql -U posgres
+Password for user posgres:
+psql: error: connection to server at "localhost" (::1), port 5432 failed: ВАЖНО:  пользователь "posgres" не прошёл проверку подлинности (по паролю)
+
+C:\Program Files\PostgreSQL\17\bin>psql -U postgres
+Password for user postgres:
+psql (17.6)
+WARNING: Console code page (866) differs from Windows code page (1251)
+         8-bit characters might not work correctly. See psql reference
+         page "Notes for Windows users" for details.
+Type "help" for help.
+
+postgres=# CREATE DATABASE lab12;
+CREATE DATABASE
+postgres=# \c lab12
+You are now connected to database "lab12" as user "postgres".
+lab12=# CREATE TABLE employees (
+lab12(#     id SERIAL PRIMARY KEY,
+lab12(#     name VARCHAR(100) NOT NULL,
+lab12(#     department VARCHAR(50),
+lab12(#     salary DECIMAL(10, 2),
+lab12(#     hire_date DATE
+lab12(# );
+CREATE TABLE
+lab12=# CREATE TABLE products (
+lab12(#     product_id SERIAL PRIMARY KEY,
+lab12(#     product_name VARCHAR(100) NOT NULL,
+lab12(#     price DECIMAL(10, 2),
+lab12(#     category VARCHAR(50)
+lab12(# );
+CREATE TABLE
+lab12=# CREATE TABLE customers (
+lab12(#     customer_id SERIAL PRIMARY KEY,
+lab12(#     customer_name VARCHAR(100) NOT NULL,
+lab12(#     email VARCHAR(100),
+lab12(#     phone VARCHAR(20)
+lab12(# );
+CREATE TABLE
+lab12=# CREATE TABLE sales (
+lab12(#     sale_id SERIAL PRIMARY KEY,
+lab12(#     employee_id INTEGER REFERENCES employees(id),
+lab12(#     customer_id INTEGER REFERENCES customers(customer_id),
+lab12(#     product_id INTEGER REFERENCES products(product_id),
+lab12(#     amount DECIMAL(10, 2),
+lab12(#     sale_date DATE
+lab12(# );
+CREATE TABLE
+lab12=# CREATE TABLE users (
+lab12(#     user_id SERIAL PRIMARY KEY,
+lab12(#     username VARCHAR(50),
+lab12(#     email VARCHAR(100),
+lab12(#     name VARCHAR(100)
+lab12(# );
+CREATE TABLE
+lab12=# INSERT INTO employees (name, department, salary, hire_date) VALUES
+lab12-# ('John Doe', 'Sales', 50000, '2022-03-15'),
+lab12-# ('Jane Smith', 'Engineering', 85000, '2021-06-10'),
+lab12-# ('Bob Johnson', 'Sales', 60000, '2023-01-20'),
+lab12-# ('Alice Brown', 'Engineering', 95000, '2020-11-05'),
+lab12-# ('Charlie Wilson', 'Marketing', 45000, '2023-05-12'),
+lab12-# ('David Lee', 'Engineering', 110000, '2019-08-22'),
+lab12-# ('Emma Davis', 'Sales', 55000, '2022-09-30');
+INSERT 0 7
+lab12=#
+lab12=# INSERT INTO products (product_name, price, category) VALUES
+lab12-# ('Laptop', 1200.00, 'Electronics'),
+lab12-# ('Strawberry Jam', 8.99, 'Food'),
+lab12-# ('Blueberry Muffin', 3.50, 'Food'),
+lab12-# ('Smartphone', 800.00, 'Electronics'),
+lab12-# ('Wireless Headphones', 150.00, 'Electronics'),
+lab12-# ('Raspberry Pi', 35.00, 'Electronics'),
+lab12-# ('Cranberry Sauce', 4.99, 'Food');
+INSERT 0 7
+lab12=# INSERT INTO customers (customer_name, email, phone) VALUES
+lab12-# ('Brad Wilson', 'brad@email.com', '555-0101'),
+lab12-# ('Brandon Miller', 'brandon@gmail.com', '555-0102'),
+lab12-# ('Brian Smith', 'brian@yahoo.com', '555-0103'),
+lab12-# ('Alice Johnson', 'alice@gmail.com', '555-0104'),
+lab12-# ('Robert Brown', 'robert@outlook.com', '555-0105');
+INSERT 0 5
+lab12=# INSERT INTO users (username, email, name) VALUES
+lab12-# ('johnd', 'john.doe@gmail.com', 'John Doe'),
+lab12-# ('janes', 'jane.smith@company.com', 'Jane Smith'),
+lab12-# ('bobj', 'bob.johnson@GMAIL.COM', 'Bob Johnson'),
+lab12-# ('aliceb', 'alice.b@yahoo.com', 'Alice Brown'),
+lab12-# ('charliew', 'charlie@outlook.com', 'Charlie Wilson');
+INSERT 0 5
+lab12=# INSERT INTO sales (employee_id, customer_id, product_id, amount, sale_date) VALUES
+lab12-# (1, 1, 1, 1200.00, '2024-01-15'),
+lab12-# (2, 2, 4, 800.00, '2024-01-16'),
+lab12-# (1, 3, 2, 8.99, '2024-01-17'),
+lab12-# (3, 4, 3, 3.50, '2024-01-18'),
+lab12-# (2, 5, 5, 150.00, '2024-01-19');
+INSERT 0 5
+lab12=# SELECT * FROM employees;
+ id |      name      | department  |  salary   | hire_date
+----+----------------+-------------+-----------+------------
+  1 | John Doe       | Sales       |  50000.00 | 2022-03-15
+  2 | Jane Smith     | Engineering |  85000.00 | 2021-06-10
+  3 | Bob Johnson    | Sales       |  60000.00 | 2023-01-20
+  4 | Alice Brown    | Engineering |  95000.00 | 2020-11-05
+  5 | Charlie Wilson | Marketing   |  45000.00 | 2023-05-12
+  6 | David Lee      | Engineering | 110000.00 | 2019-08-22
+  7 | Emma Davis     | Sales       |  55000.00 | 2022-09-30
+(7 rows)
+
+
+lab12=# SELECT name, department FROM employees;
+      name      | department
+----------------+-------------
+ John Doe       | Sales
+ Jane Smith     | Engineering
+ Bob Johnson    | Sales
+ Alice Brown    | Engineering
+ Charlie Wilson | Marketing
+ David Lee      | Engineering
+ Emma Davis     | Sales
+(7 rows)
+
+
+lab12=# SELECT name, salary, salary * 0.10 AS potential_bonus FROM employees;
+      name      |  salary   | potential_bonus
+----------------+-----------+-----------------
+ John Doe       |  50000.00 |       5000.0000
+ Jane Smith     |  85000.00 |       8500.0000
+ Bob Johnson    |  60000.00 |       6000.0000
+ Alice Brown    |  95000.00 |       9500.0000
+ Charlie Wilson |  45000.00 |       4500.0000
+ David Lee      | 110000.00 |      11000.0000
+ Emma Davis     |  55000.00 |       5500.0000
+(7 rows)
+
+
+lab12=# SELECT name, salary FROM employees WHERE department = 'Sales';
+    name     |  salary
+-------------+----------
+ John Doe    | 50000.00
+ Bob Johnson | 60000.00
+ Emma Davis  | 55000.00
+(3 rows)
+
+
+lab12=# SELECT name FROM employees WHERE salary > 75000 AND department = 'Engineering';
+    name
+-------------
+ Jane Smith
+ Alice Brown
+ David Lee
+(3 rows)
+
+
+lab12=# SELECT product_name, price FROM products WHERE price BETWEEN 20 AND 50;
+ product_name | price
+--------------+-------
+ Raspberry Pi | 35.00
+(1 row)
+
+
+lab12=#
+lab12=# -- Using NOT operator
+lab12=# SELECT name, department FROM employees WHERE department != 'Sales';
+      name      | department
+----------------+-------------
+ Jane Smith     | Engineering
+ Alice Brown    | Engineering
+ Charlie Wilson | Marketing
+ David Lee      | Engineering
+(4 rows)
+
+
+lab12=#
+lab12=# -- Using IS NULL
+lab12=# SELECT name FROM employees WHERE hire_date IS NULL;
+ name
+------
+(0 rows)
+
+
+lab12=# SELECT customer_name FROM customers WHERE customer_name LIKE 'Bra%';
+ customer_name
+----------------
+ Brad Wilson
+ Brandon Miller
+(2 rows)
+
+
+lab12=# SELECT product_name FROM products WHERE product_name LIKE '%berry';
+ product_name
+--------------
+(0 rows)
+
+
+lab12=# SELECT email FROM users WHERE email ILIKE '%@gmail.com';
+         email
+-----------------------
+ john.doe@gmail.com
+ bob.johnson@GMAIL.COM
+(2 rows)
+
+
+lab12=# SELECT name FROM employees WHERE name LIKE 'J_ne%'; -- Finds Jane, June, etc.
+    name
+------------
+ Jane Smith
+(1 row)
+
+
+lab12=# SELECT name, department FROM employees WHERE id IN (1, 3, 5);
+      name      | department
+----------------+------------
+ John Doe       | Sales
+ Bob Johnson    | Sales
+ Charlie Wilson | Marketing
+(3 rows)
+
+
+lab12=# SELECT name FROM employees WHERE id IN (
+lab12(#     SELECT employee_id FROM sales WHERE amount > 1000
+lab12(# );
+   name
+----------
+ John Doe
+(1 row)
+
+
+lab12=# SELECT name, salary,
+lab12-#     CASE
+lab12-#         WHEN salary > 100000 THEN 'Senior'
+lab12-#         WHEN salary BETWEEN 60000 AND 100000 THEN 'Mid-Level'
+lab12-#         ELSE 'Junior'
+lab12-#     END AS employee_level
+lab12-# FROM employees;
+      name      |  salary   | employee_level
+----------------+-----------+----------------
+ John Doe       |  50000.00 | Junior
+ Jane Smith     |  85000.00 | Mid-Level
+ Bob Johnson    |  60000.00 | Mid-Level
+ Alice Brown    |  95000.00 | Mid-Level
+ Charlie Wilson |  45000.00 | Junior
+ David Lee      | 110000.00 | Senior
+ Emma Davis     |  55000.00 | Junior
+(7 rows)
+
+
+lab12=# SELECT name, department, salary FROM employees
+lab12-# WHERE CASE
+lab12-#     WHEN department = 'Engineering' THEN salary > 80000
+lab12-#     WHEN department = 'Sales' THEN salary > 50000
+lab12-#     ELSE TRUE
+lab12-#     END;
+      name      | department  |  salary
+----------------+-------------+-----------
+ Jane Smith     | Engineering |  85000.00
+ Bob Johnson    | Sales       |  60000.00
+ Alice Brown    | Engineering |  95000.00
+ Charlie Wilson | Marketing   |  45000.00
+ David Lee      | Engineering | 110000.00
+ Emma Davis     | Sales       |  55000.00
+(6 rows)
+
+
+lab12=# WITH high_earners AS (
+lab12(#     SELECT * FROM employees WHERE salary > 80000
+lab12(# )
+lab12-# ;
+ОШИБКА:  ошибка синтаксиса (примерное положение: ";")
+LINE 4: ;
+        ^
+lab12=# WITH high_earners AS (
+lab12(#     SELECT * FROM employees WHERE salary > 80000
+lab12(# )
+lab12-# )
+lab12-# ;
+ОШИБКА:  ошибка синтаксиса (примерное положение: ")")
+LINE 4: )
+        ^
+lab12=# WITH high_earners AS (
+lab12(#     SELECT * FROM employees WHERE salary > 80000);
+ОШИБКА:  ошибка синтаксиса (примерное положение: ";")
+LINE 2:     SELECT * FROM employees WHERE salary > 80000);
+                                                         ^
+lab12=# \q
+
+C:\Program Files\PostgreSQL\17\bin>WITH high_earners AS (
+"WITH" не является внутренней или внешней
+командой, исполняемой программой или пакетным файлом.
+
+C:\Program Files\PostgreSQL\17\bin>    SELECT * FROM employees WHERE salary > 80000)
+Отказано в доступе.
+
+C:\Program Files\PostgreSQL\17\bin>WITH high_earners AS (
+"WITH" не является внутренней или внешней
+командой, исполняемой программой или пакетным файлом.
+
+C:\Program Files\PostgreSQL\17\bin>    SELECT * FROM employees WHERE salary > 80000
+Отказано в доступе.
+
+C:\Program Files\PostgreSQL\17\bin>)
+C:\Program Files\PostgreSQL\17\bin>SELECT name, department, salary FROM high_earners;
+"SELECT" не является внутренней или внешней
+командой, исполняемой программой или пакетным файлом.
+
+C:\Program Files\PostgreSQL\17\bin>psql -U postgres
+Password for user postgres:
+psql (17.6)
+WARNING: Console code page (866) differs from Windows code page (1251)
+         8-bit characters might not work correctly. See psql reference
+         page "Notes for Windows users" for details.
+Type "help" for help.
+
+postgres=# \c lab12
+You are now connected to database "lab12" as user "postgres".
+lab12=# WITH high_earners AS (
+lab12(#     SELECT * FROM employees WHERE salary > 80000
+lab12(# )
+lab12-# SELECT name, department, salary FROM high_earners;
+    name     | department  |  salary
+-------------+-------------+-----------
+ Jane Smith  | Engineering |  85000.00
+ Alice Brown | Engineering |  95000.00
+ David Lee   | Engineering | 110000.00
+(3 rows)
+
+
+lab12=#

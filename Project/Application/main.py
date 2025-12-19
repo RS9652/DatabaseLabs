@@ -36,7 +36,7 @@ def display_records():
 
     tree.delete(*tree.get_children())
 
-    cursor.execute('SELECT i.id, i.name, i.quantity, c.name AS customer_name, i.item_status, s.name AS sector_name FROM item i LEFT JOIN customers c ON i.id = c.id LEFT JOIN sectors s ON i.fk_sector_id = s.id;')
+    cursor.execute('SELECT i.id, i.name, i.quantity, c.name AS customer_name, i.item_status, s.name AS sector_name FROM item i JOIN customers c ON i.fk_owner_id = c.id JOIN sectors s ON i.fk_sector_id = s.id;')
     data = cursor.fetchall()
 
     for records in data:
