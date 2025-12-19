@@ -19,6 +19,8 @@ Folders:
 ...
 /LabN - 
 
+Since Lab01 and Lab02 are PostgreSQL RDMS installation instructions, they are not included, thus, we actually start from Lab03. So here is labs from 3-17 with the naming starting from Lab03 as Lab01.
+
 Author: 
 Syimyk Rasulov
 
